@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>You N Me AI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --display:'Sora',system-ui,sans-serif;--sans:'Outfit',system-ui,sans-serif;--mono:'DM Mono',monospace;
+  --bg:#0d0c0a;--bg-alt:#181614;--bg-sec:#131210;--bg-tri:#1e1b18;
+  --text:#F0EBE0;--text-b:#C8C2B4;--text-m:#8A8478;--text-f:#504E49;
+  --border:#2c2924;--bsoft:#222018;
+  --accent:#7ba4d4;--acg:rgba(123,164,212,.14);
+  --gold:#c9ae7e;--goldg:rgba(201,174,126,.14);--golds:rgba(201,174,126,.07);--goldd:#a08a5a;--goldb:#e8d4a8;
+  --red:#e85454;--green:#3fc87a;--amber:#f5a623;--blue:#4a9eff;
+  --ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.175,.885,.32,1.275);
+  --r1:4px;--r2:8px;--r3:14px;--r4:20px;--r5:28px;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.3);--shadow-md:0 8px 32px rgba(0,0,0,.4);--shadow-lg:0 24px 72px rgba(0,0,0,.5);
+}
+[data-theme="light"]{
+  --bg:#F2EDE4;--bg-alt:#FDFAF5;--bg-sec:#EDE8DE;--bg-tri:#E8E2D6;
+  --text:#1A1612;--text-b:#3D3830;--text-m:#6B6358;--text-f:#9C9388;
+  --border:#D8D2C6;--bsoft:#E4DED4;
+  --accent:#2a5a9a;--acg:rgba(42,90,154,.1);
+  --gold:#9A7030;--goldg:rgba(154,112,48,.14);--golds:rgba(154,112,48,.07);--goldd:#7A5520;--goldb:#C49040;
+  --red:#C8362A;--green:#2A8A4A;--amber:#C47820;--blue:#2A60C8;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.08);--shadow-md:0 8px 32px rgba(0,0,0,.12);--shadow-lg:0 24px 72px rgba(0,0,0,.16);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);font-size:13.5px;font-weight:400;line-height:1.6;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .4s,color .4s;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+::selection{background:var(--goldg);color:var(--gold);}
+input,textarea,button,select{font-family:inherit;}
+.hidden{display:none!important;}
+.page{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;transition:opacity .8s var(--ease),transform .8s var(--ease),filter .8s var(--ease);}
+.page.out{opacity:0;pointer-events:none;transform:scale(.95);filter:blur(14px);}
+
+/* ── THEME BTN */
+#theme-btn{position:fixed;top:20px;right:20px;z-index:1000;width:38px;height:38px;border-radius:50%;background:var(--bg-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-m);font-size:16px;transition:all .3s;box-shadow:var(--shadow-sm);}
+#theme-btn:hover{border-color:var(--gold);color:var(--gold);transform:rotate(20deg);}
+
+/* ── NOTIF */
+#notif-stack{position:fixed;top:20px;right:68px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.notif{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r3);padding:13px 17px;min-width:260px;display:flex;align-items:flex-start;gap:11px;box-shadow:var(--shadow-md);animation:nIn .4s var(--ease);position:relative;overflow:hidden;}
+.notif::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;}
+.notif.success::before{background:var(--green);}.notif.danger::before{background:var(--red);}.notif.warning::before{background:var(--amber);}.notif.info::before{background:var(--accent);}
+@keyframes nIn{from{opacity:0;transform:translateX(28px) scale(.96);}to{opacity:1;transform:none;}}
+.n-ico{width:26px;height:26px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.notif.success .n-ico{color:var(--green);}.notif.danger .n-ico{color:var(--red);}.notif.warning .n-ico{color:var(--amber);}.notif.info .n-ico{color:var(--accent);}
+.n-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:1px;}
+.n-body{font-size:11px;color:var(--text-m);}
+
+/* ── ORBS */
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;animation:orbFloat 12s ease-in-out infinite;}
+.orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(201,174,126,.12),transparent 70%);top:-100px;left:-100px;}
+.orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(123,164,212,.1),transparent 70%);bottom:-100px;right:-80px;animation-delay:-5s;}
+.orb-3{width:300px;height:300px;background:radial-gradient(circle,rgba(63,200,122,.06),transparent 70%);top:40%;right:20%;animation-delay:-9s;}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(30px,-20px) scale(1.05);}66%{transform:translate(-20px,25px) scale(.96);}}
+
+/* ══════════════════════════════════════════
+   FACE ID SCREEN
+══════════════════════════════════════════ */
+#page-faceid{background:var(--bg);}
+.fid-card{position:relative;z-index:5;width:420px;max-width:94vw;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r5);padding:40px 36px 32px;box-shadow:var(--shadow-lg),0 0 0 1px var(--bsoft) inset;overflow:hidden;animation:cardUp .9s var(--ease) .1s both;}
+.fid-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 5%,var(--goldd) 30%,var(--goldb) 50%,var(--goldd) 70%,transparent 95%);opacity:.7;}
+@keyframes cardUp{from{opacity:0;transform:translateY(36px) scale(.97);}to{opacity:1;transform:none;}}
+.fid-brand{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.fid-mark{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:linear-gradient(135deg,var(--bg-sec),var(--bg-tri));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;color:var(--gold);font-weight:700;}
+.fid-name{font-family:var(--display);font-size:18px;color:var(--text);letter-spacing:.08em;font-weight:600;}
+.fid-sub{font-family:var(--mono);font-size:8.5px;color:var(--text-m);letter-spacing:.26em;text-transform:uppercase;}
+.fid-headline{font-family:var(--display);font-size:22px;font-weight:300;color:var(--text);margin-bottom:6px;letter-spacing:-.02em;}
+.fid-headline em{font-style:italic;color:var(--gold);}
+.fid-desc{font-size:12.5px;color:var(--text-m);margin-bottom:22px;line-height:1.7;}
+.cam-ring-wrap{width:200px;height:200px;margin:0 auto 18px;position:relative;}
+.cam-outer{width:200px;height:200px;border-radius:50%;position:relative;}
+.cam-ring-spinner{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold);border-right-color:var(--gold);animation:cSpin 1.8s linear infinite;z-index:5;}
+.cam-ring-track{position:absolute;inset:0;border-radius:50%;border:2px solid var(--border);}
+.cam-dots{position:absolute;inset:-8px;z-index:6;}
+.cam-dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--goldg);}
+.cam-dot:nth-child(1){top:0;left:50%;transform:translateX(-50%);}
+.cam-dot:nth-child(2){bottom:0;left:50%;transform:translateX(-50%);}
+.cam-dot:nth-child(3){left:0;top:50%;transform:translateY(-50%);}
+.cam-dot:nth-child(4){right:0;top:50%;transform:translateY(-50%);}
+.cam-video{position:absolute;inset:8px;border-radius:50%;overflow:hidden;z-index:3;background:var(--bg-sec);}
+.cam-video video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+.cam-scan-line{position:absolute;inset:8px;border-radius:50%;z-index:4;overflow:hidden;}
+.cam-scan-line::after{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,232,255,.6),transparent);animation:scanLine 2.2s ease-in-out infinite;box-shadow:0 0 12px rgba(0,232,255,.4);}
+@keyframes scanLine{0%{top:0;}100%{top:100%;}}
+.cam-idle{position:absolute;inset:8px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg-sec);z-index:3;}
+.cam-idle-ico{font-size:56px;opacity:.15;user-select:none;}
+@keyframes cSpin{to{transform:rotate(360deg)}}
+.cam-mesh{position:absolute;inset:8px;border-radius:50%;z-index:3;opacity:0;transition:opacity .5s;background-image:linear-gradient(rgba(0,232,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,255,.04) 1px,transparent 1px);background-size:16px 16px;pointer-events:none;}
+.cam-mesh.on{opacity:1;}
+.fid-status{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:20px;min-height:16px;color:var(--text-m);}
+.fid-status.scanning{color:var(--blue);animation:blink 1.2s infinite;}
+.fid-status.success{color:var(--green);}
+.fid-status.error{color:var(--red);}
+.fid-status.warn{color:var(--amber);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+.conf-meter{height:4px;background:var(--bg-sec);border-radius:4px;overflow:hidden;margin-bottom:18px;display:none;}
+.conf-meter.on{display:block;}
+.conf-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));width:0%;transition:width .3s ease;}
+.fid-btn{width:100%;padding:14px;background:var(--text);border:none;border-radius:var(--r3);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .35s var(--ease);display:flex;align-items:center;justify-content:center;gap:8px;}
+.fid-btn:hover{opacity:.9;transform:translateY(-2px);}
+[data-theme="light"] .fid-btn{color:#FDFAF5;}
+.fid-btn:disabled{opacity:.4;pointer-events:none;transform:none;}
+.fid-links{display:flex;justify-content:center;gap:24px;margin-top:14px;}
+.fid-link{font-family:var(--mono);font-size:9.5px;color:var(--text-f);cursor:pointer;letter-spacing:.16em;text-transform:uppercase;position:relative;padding-bottom:3px;transition:color .3s;}
+.fid-link::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s var(--ease);}
+.fid-link:hover{color:var(--gold);}.fid-link:hover::after{width:100%;}
+.fid-err{text-align:center;font-family:var(--mono);font-size:9.5px;color:var(--red);letter-spacing:.08em;text-transform:uppercase;min-height:14px;margin-bottom:10px;}
+@keyframes errShake{0%,100%{transform:none;}25%,75%{transform:translateX(-6px);}50%{transform:translateX(6px);}}
+.shake{animation:errShake .4s var(--spring);}
+.fid-float{position:absolute;z-index:2;display:flex;align-items:center;gap:9px;padding:9px 14px;background:var(--bg-alt);border:1px solid var(--border);border-radius:99px;font-size:12px;color:var(--text-m);box-shadow:var(--shadow-sm);animation:floatIn .8s var(--ease) both,floatBob 6s ease-in-out infinite;}
+.fid-float.ff1{top:12%;left:6%;animation-delay:.2s,.2s;}.fid-float.ff2{top:20%;right:7%;animation-delay:.45s,.45s;}.fid-float.ff3{bottom:16%;left:8%;animation-delay:.65s,.65s;}
+@keyframes floatIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;}}
+@keyframes floatBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.ff-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ff-dot.green{background:var(--green);box-shadow:0 0 8px rgba(63,200,122,.5);}
+.ff-dot.gold{background:var(--gold);box-shadow:0 0 8px rgba(201,174,126,.5);}
+.ff-dot.blue{background:var(--blue);box-shadow:0 0 8px rgba(74,158,255,.5);}
+.ff-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-f);}
+.ff-val{font-weight:600;color:var(--text);font-size:12.5px;}
+
+/* ══════════════════════════════════════════
+   REGISTRATION
+══════════════════════════════════════════ */
+#page-register{background:var(--bg);}
+.reg-card{position:relative;z-index:5;width:470px;max-width:94vw;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r5);padding:38px 36px 32px;box-shadow:var(--shadow-lg),0 0 0 1px var(--bsoft) inset;overflow:hidden;animation:cardUp .9s var(--ease) both;}
+.reg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 5%,var(--accent) 30%,var(--gold) 60%,transparent 95%);opacity:.65;}
+.reg-progress{display:flex;gap:5px;margin-bottom:26px;}
+.rp-step{flex:1;height:3px;border-radius:3px;background:var(--border);transition:all .5s var(--ease);}
+.rp-step.done{background:var(--gold);}.rp-step.active{background:var(--accent);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.rs{display:none;animation:stepIn .45s var(--ease) both;}.rs.active{display:block;}
+@keyframes stepIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+.rs-title{font-family:var(--display);font-size:21px;font-weight:300;color:var(--text);letter-spacing:-.02em;margin-bottom:5px;}
+.rs-title em{font-style:italic;color:var(--gold);}
+.rs-sub{font-size:12.5px;color:var(--text-m);margin-bottom:20px;line-height:1.75;}
+.r-label{font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.2em;text-transform:uppercase;margin-bottom:7px;}
+.r-input{width:100%;padding:11px 14px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r3);color:var(--text);font-size:14px;outline:none;transition:all .3s;margin-bottom:14px;}
+.r-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--golds);}
+.r-input::placeholder{color:var(--text-f);}
+.r-input.code{letter-spacing:16px;font-size:22px;text-align:center;font-family:var(--mono);}
+.r-btn{width:100%;padding:13px;background:var(--text);border:none;border-radius:var(--r3);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .3s var(--ease);margin-top:6px;}
+.r-btn:hover{opacity:.88;transform:translateY(-1px);}[data-theme="light"] .r-btn{color:#FDFAF5;}
+.r-btn.sec{background:transparent;border:1px solid var(--border);color:var(--text-m);}
+.r-btn.sec:hover{border-color:var(--gold);color:var(--text);}
+.r-error{font-family:var(--mono);font-size:9.5px;color:var(--red);margin-top:4px;letter-spacing:.06em;min-height:14px;}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:8px 0 4px;}
+.pdot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border);transition:all .35s var(--spring);}
+.pdot.on{background:var(--gold);border-color:var(--gold);transform:scale(1.35);box-shadow:0 0 14px var(--goldg);}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px;}
+.nk{padding:13px;border:1px solid var(--border);border-radius:var(--r2);background:var(--bg-sec);color:var(--text);font-family:var(--display);font-size:17px;font-weight:600;cursor:pointer;transition:all .2s var(--ease);display:flex;align-items:center;justify-content:center;}
+.nk:hover{border-color:var(--gold);color:var(--gold);background:var(--bg-alt);transform:translateY(-1px);}
+.nk:active{transform:scale(.96);}
+.done-circle{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--goldg),var(--bg-sec));border:1px solid var(--goldd);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:24px;}
+.reg-cam-wrap{width:150px;height:150px;border-radius:50%;margin:0 auto 14px;position:relative;overflow:hidden;border:2px solid var(--border);background:var(--bg-sec);}
+.reg-cam-wrap .spin{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold);border-right-color:var(--gold);animation:cSpin 1.8s linear infinite;z-index:4;}
+.reg-cam-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;z-index:2;transform:scaleX(-1);}
+
+/* ══════════════════════════════════════════
+   PROFILE SELECTION
+══════════════════════════════════════════ */
+#page-profiles{background:var(--bg);}
+.prof-bg{position:absolute;inset:0;z-index:0;}
+.prof-wrap{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;gap:32px;padding:20px;}
+.prof-head{text-align:center;}
+.prof-title{font-family:var(--display);font-size:30px;font-weight:300;letter-spacing:-.02em;color:var(--text);}
+.prof-title em{font-style:italic;color:var(--gold);}
+.prof-sub{font-family:var(--mono);font-size:9.5px;color:var(--text-f);letter-spacing:.22em;text-transform:uppercase;margin-top:4px;}
+.prof-cards{display:flex;gap:18px;align-items:stretch;}
+.prof-card{width:220px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r5);padding:32px 24px 26px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;overflow:hidden;transition:all .45s var(--ease);animation:cardUp .7s var(--ease) both;}
+.prof-card:nth-child(2){animation-delay:.1s;}
+.prof-card:nth-child(3){animation-delay:.2s;}
+.prof-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;opacity:0;transition:opacity .4s;}
+.prof-card:nth-child(1)::before{background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.prof-card:nth-child(2)::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.prof-card:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.prof-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,var(--bg-tri),transparent 70%);opacity:0;transition:opacity .4s;}
+.prof-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg);border-color:var(--text-f);}
+.prof-card:hover::before{opacity:.7;}
+.prof-card:hover::after{opacity:1;}
+.prof-ico-ring{width:80px;height:80px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;}
+.prof-ico-ring::before{content:'';position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--border);}
+.prof-ico-ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid transparent;transition:all .4s;}
+.prof-card:hover .prof-ico-ring::after{inset:-8px;border-color:var(--border);}
+.prof-ico{font-size:32px;user-select:none;}
+.prof-label{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text);letter-spacing:.02em;z-index:1;}
+.prof-desc{font-size:11.5px;color:var(--text-m);line-height:1.65;text-align:center;z-index:1;}
+.prof-tag{font-family:var(--mono);font-size:8.5px;color:var(--text-f);letter-spacing:.18em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--border);border-radius:99px;z-index:1;transition:all .35s;}
+.prof-card:nth-child(1):hover .prof-tag{border-color:var(--blue);color:var(--blue);}
+.prof-card:nth-child(2):hover .prof-tag{border-color:var(--gold);color:var(--gold);}
+.prof-card:nth-child(3):hover .prof-tag{border-color:var(--green);color:var(--green);}
+.prof-card:nth-child(1) .prof-ico-ring{background:rgba(74,158,255,.08);}
+.prof-card:nth-child(2) .prof-ico-ring{background:rgba(201,174,126,.08);}
+.prof-card:nth-child(3) .prof-ico-ring{background:rgba(63,200,122,.08);}
+.prof-footer{display:flex;align-items:center;gap:10px;}
+.prof-user-av{width:32px;height:32px;border-radius:50%;background:var(--bg-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:13px;color:var(--gold);font-weight:700;}
+.prof-user-info{font-size:12.5px;color:var(--text-b);}
+.prof-user-sub{font-family:var(--mono);font-size:9px;color:var(--text-m);letter-spacing:.1em;text-transform:uppercase;}
+.prof-lock-btn{margin-left:auto;padding:7px 14px;background:transparent;border:1px solid var(--border);border-radius:99px;color:var(--text-m);font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+.prof-lock-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ══════════════════════════════════════════
+   AI MODULE  
+══════════════════════════════════════════ */
+#page-ai{background:#040608;}
+.ai-shell{width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.ai-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(40,80,160,.4) 0%,transparent 55%),radial-gradient(ellipse at 70% 80%,rgba(10,40,100,.35) 0%,transparent 50%),#020406;z-index:0;}
+.ai-grid{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(74,158,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(74,158,255,.03) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse at 50% 50%,black 30%,transparent 80%);}
+.ai-topbar{position:relative;z-index:10;height:58px;padding:0 22px;background:rgba(4,6,8,.95);border-bottom:1px solid rgba(74,158,255,.1);display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.ai-back-btn{padding:6px 14px;background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.15);border-radius:var(--r2);color:rgba(74,158,255,.5);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+.ai-back-btn:hover{background:rgba(74,158,255,.12);color:#7ba4d4;border-color:rgba(74,158,255,.3);}
+.ai-title{font-family:var(--mono);font-size:14px;color:#7ab8f8;letter-spacing:.08em;flex:1;}
+.ai-title-tag{font-family:var(--mono);font-size:8.5px;color:rgba(74,158,255,.3);letter-spacing:.18em;text-transform:uppercase;margin-top:1px;}
+.ai-t-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(74,158,255,.05);border:1px solid rgba(74,158,255,.15);border-radius:var(--r2);color:rgba(74,158,255,.4);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+.ai-t-btn:hover{background:rgba(74,158,255,.12);color:#7ba4d4;}
+.ai-name-bar{position:relative;z-index:10;padding:8px 22px;background:rgba(4,6,8,.85);border-bottom:1px solid rgba(74,158,255,.07);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;}
+.ai-name-label{font-family:var(--mono);font-size:9px;color:rgba(74,158,255,.5);letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;}
+.ai-name-input{flex:1;max-width:170px;padding:5px 10px;background:rgba(74,158,255,.05);border:1px solid rgba(74,158,255,.15);border-radius:var(--r2);color:#a0c8f8;font-family:var(--mono);font-size:12px;outline:none;transition:all .3s;}
+.ai-name-input:focus{border-color:rgba(74,158,255,.4);}
+.ai-name-input::placeholder{color:rgba(74,158,255,.22);}
+.ai-name-save{padding:5px 12px;background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.22);border-radius:var(--r2);color:#7ba4d4;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .25s;white-space:nowrap;}
+.ai-name-save:hover{background:rgba(74,158,255,.2);color:#a8d0ff;}
+.ai-controls{position:relative;z-index:10;padding:6px 22px;background:rgba(4,6,8,.8);border-bottom:1px solid rgba(74,158,255,.06);display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap;}
+.ctrl-label{font-family:var(--mono);font-size:9px;color:rgba(74,158,255,.4);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;}
+.ctrl-seg{display:flex;gap:2px;background:rgba(0,0,0,.4);border:1px solid rgba(74,158,255,.08);border-radius:var(--r2);padding:2px;}
+.ctrl-btn{padding:3px 9px;border-radius:4px;border:none;background:transparent;color:rgba(74,158,255,.38);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.ctrl-btn.active{background:rgba(74,158,255,.16);color:#7ba4d4;border:1px solid rgba(74,158,255,.2);}
+.ctrl-btn:hover:not(.active){background:rgba(74,158,255,.07);color:rgba(74,158,255,.7);}
+#voice-status{margin-left:auto;font-family:var(--mono);font-size:9px;color:rgba(74,158,255,.3);letter-spacing:.1em;text-transform:uppercase;}
+.robot-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;z-index:2;padding:10px 20px 20px;gap:10px;}
+.speech-orb{position:relative;background:rgba(6,12,28,.94);border:1px solid rgba(74,158,255,.22);border-radius:16px;padding:12px 20px;max-width:400px;min-width:200px;text-align:center;font-family:var(--mono);font-size:12px;color:#7ab8f8;line-height:1.7;letter-spacing:.02em;margin-bottom:14px;flex-shrink:0;transition:all .3s;}
+.speech-orb::after{content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:9px solid rgba(74,158,255,.22);}
+.speech-orb::before{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:8px solid rgba(6,12,28,.94);z-index:1;}
+.speech-orb.thinking{border-color:rgba(201,174,126,.3);color:#c9ae7e;}
+.speech-orb.speaking{border-color:rgba(0,212,255,.3);color:#00d4ff;animation:speechPulse 2s ease-in-out infinite;}
+@keyframes speechPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.05);}50%{box-shadow:0 0 20px 6px rgba(0,212,255,.08);}}
+.think-dots-ai{display:none;gap:6px;align-items:center;justify-content:center;margin-top:4px;}
+.think-dots-ai.on{display:flex;}
+.tdai{width:5px;height:5px;border-radius:50%;background:rgba(201,174,126,.5);animation:tdaAnim 1.2s infinite;}
+.tdai:nth-child(2){animation-delay:.2s}.tdai:nth-child(3){animation-delay:.4s}
+@keyframes tdaAnim{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.voice-waves{display:none;gap:3px;align-items:center;justify-content:center;height:14px;margin-top:4px;}
+.voice-waves.on{display:flex;}
+.vw{width:3px;border-radius:2px;background:#00d4ff;animation:vwave .65s ease-in-out infinite;}
+.vw:nth-child(1){animation-delay:0s}.vw:nth-child(2){animation-delay:.09s}.vw:nth-child(3){animation-delay:.18s}.vw:nth-child(4){animation-delay:.27s}.vw:nth-child(5){animation-delay:.18s}.vw:nth-child(6){animation-delay:.09s}.vw:nth-child(7){animation-delay:0s}
+@keyframes vwave{0%,100%{height:2px;opacity:.3}50%{height:13px;opacity:1}}
+@keyframes robFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes robTalk{0%,100%{transform:translateY(0)}25%{transform:translateY(-3px) rotate(.3deg)}75%{transform:translateY(-1.5px) rotate(-.3deg)}}
+@keyframes robThink{0%,100%{transform:rotate(0) translateY(0)}33%{transform:rotate(1.5deg) translateY(-3px)}66%{transform:rotate(-1deg) translateY(-2px)}}
+.robo-root{animation:robFloat 4s ease-in-out infinite;cursor:default;filter:drop-shadow(0 20px 40px rgba(74,158,255,.15));}
+.robo-root:hover{filter:drop-shadow(0 30px 60px rgba(74,158,255,.5))!important;transform:scale(1.03);}
+#robot-name-badge{position:relative;z-index:10;font-family:var(--mono);font-size:9.5px;color:rgba(74,158,255,.4);letter-spacing:.18em;text-transform:uppercase;margin-top:4px;text-align:center;padding-bottom:6px;}
+.ai-input-bar{padding:10px 18px 14px;border-top:1px solid rgba(74,158,255,.1);background:rgba(4,6,8,.97);z-index:10;flex-shrink:0;}
+.ai-irow{display:flex;gap:7px;align-items:flex-end;}
+.ai-iwrap{flex:1;background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.14);border-radius:var(--r3);display:flex;align-items:center;padding:4px 4px 4px 12px;transition:all .25s;}
+.ai-iwrap:focus-within{border-color:rgba(74,158,255,.36);background:rgba(74,158,255,.07);}
+.ai-cta{flex:1;background:transparent;border:none;color:#a0c8f8;font-family:var(--sans);font-size:13px;padding:7px 0;outline:none;resize:none;max-height:90px;line-height:1.5;}
+.ai-cta::placeholder{color:rgba(74,158,255,.2);}
+.ai-ib{width:38px;height:38px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .25s;flex-shrink:0;border:none;}
+.ai-ib-send{background:rgba(74,158,255,.18);border:1px solid rgba(74,158,255,.28)!important;color:#7ba4d4;}
+.ai-ib-send:hover{background:rgba(74,158,255,.3);transform:translateY(-1px);}
+.ai-ib-mic{background:rgba(74,158,255,.05);border:1px solid rgba(74,158,255,.12)!important;color:rgba(74,158,255,.4);}
+.ai-ib-mic.on{background:rgba(232,84,84,.1);border-color:rgba(232,84,84,.38)!important;color:var(--red);animation:vPulse 2s infinite;}
+@keyframes vPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,84,84,.12);}50%{box-shadow:0 0 0 8px rgba(232,84,84,0);}}
+
+/* Image gen modal */
+.overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;transition:opacity .4s var(--ease);}
+.overlay.hidden{opacity:0;pointer-events:none;}
+.igmodal{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r4);padding:26px;width:500px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;transition:all .45s var(--ease);}
+.igmodal::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45;}
+.ig-canvas{width:100%;height:260px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r3);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;position:relative;}
+.ig-empty{font-size:13px;color:var(--text-m);}
+.ig-inp{width:100%;padding:10px 14px;margin-bottom:10px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);font-size:13px;outline:none;transition:all .28s;}
+.ig-inp:focus{border-color:var(--gold);}
+.ig-inp::placeholder{color:var(--text-f);}
+.btn-row{display:flex;gap:8px;}
+.gbtn{flex:1;padding:11px;border:none;border-radius:var(--r2);background:var(--text);color:var(--bg);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:6px;}
+[data-theme="light"] .gbtn{color:#FDFAF5;}
+.gbtn:hover{opacity:.85;transform:translateY(-1px);}
+.gbtn.sec{background:var(--bg-sec);border:1px solid var(--border);color:var(--text-m);}
+.gbtn.sec:hover{border-color:var(--text-m);color:var(--text);}
+
+/* ══════════════════════════════════════════
+   MESSENGER MODULE
+══════════════════════════════════════════ */
+#page-msg{background:var(--bg);}
+.msg-shell{width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.msg-topbar{height:56px;min-height:56px;background:var(--bg-alt);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;}
+.msg-topbar-title{font-family:var(--display);font-size:15px;font-weight:600;color:var(--text);flex:1;}
+.msg-back-btn{padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:99px;color:var(--text-m);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+.msg-back-btn:hover{border-color:var(--gold);color:var(--gold);}
+.msg-alerts-btn{padding:6px 14px;background:rgba(232,84,84,.08);border:1px solid rgba(232,84,84,.2);border-radius:99px;color:var(--red);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:5px;}
+.msg-alerts-btn:hover{background:rgba(232,84,84,.15);border-color:rgba(232,84,84,.4);}
+.msg-content{flex:1;display:flex;overflow:hidden;}
+.cp{width:290px;flex-shrink:0;background:var(--bg-alt);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.my-id-banner{padding:10px 14px;background:var(--goldg);border-bottom:1px solid rgba(201,174,126,.2);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.my-id-banner:hover{background:rgba(201,174,126,.2);}
+.my-id-label{font-family:var(--mono);font-size:8px;color:var(--goldd);letter-spacing:.2em;text-transform:uppercase;}
+.my-id-value{font-family:var(--mono);font-size:11.5px;color:var(--gold);font-weight:500;}
+.my-id-copy{margin-left:auto;font-size:12px;opacity:.5;}
+.cp-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg-sec);}
+.cp-tab{flex:1;padding:9px 4px;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-f);cursor:pointer;border-bottom:2px solid transparent;transition:all .25s;position:relative;}
+.cp-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.cp-tab:hover:not(.active){color:var(--text-m);}
+.cp-tab-badge{position:absolute;top:6px;right:8px;background:var(--red);color:#fff;border-radius:99px;padding:1px 5px;font-size:8px;font-weight:700;}
+.cp-head{padding:10px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.search-wrap{position:relative;}
+.cp-search{width:100%;padding:7px 12px 7px 32px;background:var(--bg-sec);border:1px solid var(--border);border-radius:99px;color:var(--text);font-size:13px;outline:none;transition:all .25s;}
+.cp-search:focus{border-color:var(--gold);}
+.cp-search::placeholder{color:var(--text-f);}
+.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.35;pointer-events:none;}
+.cp-list{flex:1;overflow-y:auto;}
+.ci{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bsoft);transition:background .2s;position:relative;}
+.ci:hover{background:var(--bg-sec);}
+.ci.active{background:var(--bg-sec);}
+.ci.active::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0;}
+.ci-av{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;position:relative;}
+.ci-av-online::after,.ci-av-away::after{content:'';position:absolute;bottom:1px;right:1px;width:9px;height:9px;border-radius:50%;border:2px solid var(--bg-alt);}
+.ci-av-online::after{background:var(--green);box-shadow:0 0 6px rgba(63,200,122,.5);}
+.ci-av-away::after{background:var(--amber);}
+.ci-info{flex:1;min-width:0;}
+.ci-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.ci-name{font-size:13px;font-weight:600;color:var(--text);}
+.ci-time{font-family:var(--mono);font-size:10px;color:var(--text-f);}
+.ci-row2{display:flex;justify-content:space-between;align-items:center;}
+.ci-prev{font-size:11.5px;color:var(--text-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.ci-un{background:var(--green);color:#fff;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:700;font-family:var(--mono);flex-shrink:0;margin-left:6px;}
+.ci-uid{font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.06em;}
+.blocked-item{padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bsoft);}
+.blocked-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:.5;}
+.blocked-name{flex:1;font-size:13px;color:var(--text-m);}
+.unblock-btn{padding:4px 10px;background:transparent;border:1px solid var(--border);border-radius:99px;color:var(--text-m);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.unblock-btn:hover{border-color:var(--green);color:var(--green);}
+.contact-add{padding:10px 14px;display:flex;gap:8px;border-bottom:1px solid var(--border);}
+.contact-add-inp{flex:1;padding:8px 12px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:all .25s;}
+.contact-add-inp:focus{border-color:var(--gold);}
+.contact-add-inp::placeholder{color:var(--text-f);}
+.contact-add-btn{padding:8px 12px;background:var(--goldg);border:1px solid rgba(201,174,126,.3);border-radius:var(--r2);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.contact-add-btn:hover{background:rgba(201,174,126,.25);}
+.cc{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg);}
+.cc-head{padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg-alt);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.cc-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;position:relative;}
+.cc-online::after{content:'';position:absolute;bottom:1px;right:1px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--bg-alt);}
+.cc-name{font-size:13.5px;font-weight:600;color:var(--text);}
+.cc-status{font-family:var(--mono);font-size:9px;color:var(--text-m);letter-spacing:.1em;text-transform:uppercase;}
+.cc-actions{margin-left:auto;display:flex;gap:6px;}
+.cc-btn{width:30px;height:30px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text-m);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s;}
+.cc-btn:hover{border-color:var(--gold);color:var(--gold);}
+.cc-btn.block-btn:hover{border-color:var(--red);color:var(--red);}
+.chat-area{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:2px;background:var(--bg);position:relative;}
+.chat-area::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.1;pointer-events:none;}
+.date-divider{display:flex;align-items:center;justify-content:center;margin:10px 0;}
+.date-divider span{font-family:var(--mono);font-size:10px;color:var(--text-m);background:var(--bg-alt);border:1px solid var(--border);padding:3px 12px;border-radius:99px;letter-spacing:.06em;}
+.msg-row{display:flex;margin-bottom:2px;animation:msgIn .28s var(--ease);}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.97);}to{opacity:1;transform:none;}}
+.msg-row.sent{justify-content:flex-end;}.msg-row.recv{justify-content:flex-start;}
+.msg-row.sent + .msg-row.recv,.msg-row.recv + .msg-row.sent{margin-top:8px;}
+.bubble{max-width:65%;padding:8px 12px 6px;border-radius:12px;position:relative;word-break:break-word;}
+.bubble-text{font-size:13.5px;line-height:1.55;color:var(--text-b);}
+.msg-row.sent .bubble{background:rgba(201,174,126,.18);border:1px solid rgba(201,174,126,.25);border-bottom-right-radius:3px;}
+.msg-row.recv .bubble{background:var(--bg-alt);border:1px solid var(--border);border-bottom-left-radius:3px;}
+.msg-row.sent .bubble::after{content:'';position:absolute;bottom:0;right:-6px;border-top:6px solid transparent;border-bottom:0 solid transparent;border-left:7px solid rgba(201,174,126,.25);}
+.msg-row.recv .bubble::after{content:'';position:absolute;bottom:0;left:-6px;border-top:6px solid transparent;border-bottom:0 solid transparent;border-right:7px solid var(--border);}
+.msg-meta{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:3px;}
+.msg-time{font-family:var(--mono);font-size:10px;color:var(--text-f);}
+.msg-lock{font-size:9px;color:var(--text-f);opacity:.6;}
+.msg-ticks{font-size:11px;line-height:1;}
+.msg-ticks.sent{color:var(--text-f);}.msg-ticks.delivered{color:var(--text-m);}.msg-ticks.read{color:#53bdeb;}
+.bubble-img{width:200px;height:150px;border-radius:8px;object-fit:cover;display:block;margin-bottom:4px;cursor:pointer;}
+.voice-note{display:flex;align-items:center;gap:8px;padding:2px 0;}
+.vn-play{width:30px;height:30px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:12px;flex-shrink:0;transition:opacity .2s;}
+.vn-play:hover{opacity:.8;}
+.vn-wave{flex:1;height:26px;display:flex;align-items:center;gap:1.5px;}
+.vn-bar{width:2.5px;border-radius:2px;background:var(--text-m);opacity:.5;}
+.msg-row.sent .vn-bar{background:var(--gold);}
+.vn-dur{font-family:var(--mono);font-size:10px;color:var(--text-m);white-space:nowrap;}
+.typing-row{display:flex;margin-bottom:6px;}
+.typing-bubble{background:var(--bg-alt);border:1px solid var(--border);border-radius:12px;border-bottom-left-radius:3px;padding:10px 14px;display:flex;gap:5px;align-items:center;}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text-m);animation:typeDot 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typeDot{0%,60%,100%{transform:scale(.8);opacity:.4}30%{transform:scale(1.1);opacity:1}}
+.no-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text-f);}
+.no-chat-ico{font-size:44px;opacity:.15;}
+.no-chat-title{font-family:var(--display);font-size:14px;color:var(--text-m);}
+.no-chat-sub{font-size:12px;color:var(--text-f);text-align:center;}
+.ibar{padding:8px 16px 12px;border-top:1px solid var(--border);background:var(--bg-alt);flex-shrink:0;}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.chip-row:empty{display:none;}
+.chip{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 7px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r2);font-size:11.5px;color:var(--text-b);max-width:180px;position:relative;overflow:hidden;}
+.chip::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);}
+.chip-n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chip-x{width:14px;height:14px;border-radius:50%;background:var(--bg-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:var(--text-m);flex-shrink:0;transition:all .2s;}
+.chip-x:hover{background:var(--red);border-color:var(--red);color:#fff;}
+.irow{display:flex;gap:7px;align-items:flex-end;}
+.iwrap{flex:1;background:var(--bg-sec);border:1px solid var(--border);border-radius:99px;display:flex;align-items:center;padding:5px 8px 5px 14px;transition:all .25s;}
+.iwrap:focus-within{border-color:var(--gold);box-shadow:0 0 0 2px var(--golds);}
+.cta{flex:1;background:transparent;border:none;color:var(--text);font-size:13.5px;padding:5px 0;outline:none;resize:none;max-height:90px;line-height:1.5;}
+.cta::placeholder{color:var(--text-f);}
+.ib{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .25s;flex-shrink:0;border:none;}
+.ib-ghost{background:var(--bg-sec);border:1px solid var(--border) !important;color:var(--text-m);}
+.ib-ghost:hover{border-color:var(--gold) !important;color:var(--gold);}
+.ib-send{background:var(--gold);color:var(--bg);}
+.ib-send:hover{opacity:.88;transform:translateY(-1px);}
+.ghost-overlay{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:20;}
+.ghost-ico{font-size:52px;opacity:.12;}
+.ghost-title{font-family:var(--display);font-size:20px;color:var(--text-m);font-weight:300;}
+.ghost-sub{font-family:var(--mono);font-size:9.5px;color:var(--text-f);letter-spacing:.18em;text-transform:uppercase;text-align:center;}
+.ghost-verify-btn{padding:12px 28px;background:var(--text);border:none;border-radius:var(--r3);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+.ghost-verify-btn:hover{opacity:.85;transform:translateY(-2px);}
+[data-theme="light"] .ghost-verify-btn{color:#FDFAF5;}
+.chat-fid-overlay{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:20;}
+.chat-fid-ring{width:120px;height:120px;border-radius:50%;position:relative;margin-bottom:4px;}
+.chat-fid-ring video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scaleX(-1);}
+.chat-fid-spinner{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold);border-right-color:var(--gold);animation:cSpin 1.8s linear infinite;}
+.chat-fid-ring-track{position:absolute;inset:0;border-radius:50%;border:2px solid var(--border);}
+.chat-fid-video-bg{position:absolute;inset:4px;border-radius:50%;overflow:hidden;background:var(--bg-sec);}
+.chat-fid-idle{position:absolute;inset:4px;border-radius:50%;background:var(--bg-sec);display:flex;align-items:center;justify-content:center;font-size:36px;opacity:.2;}
+.chat-fid-status{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-m);}
+.chat-fid-status.scanning{color:var(--blue);animation:blink 1.2s infinite;}
+.chat-fid-status.success{color:var(--green);}
+.chat-fid-status.error{color:var(--red);}
+.chat-fid-title{font-family:var(--display);font-size:17px;color:var(--text);font-weight:300;}
+.chat-fid-title em{font-style:italic;color:var(--gold);}
+.chat-fid-sub{font-size:12px;color:var(--text-m);text-align:center;max-width:260px;line-height:1.6;}
+.chat-fid-btn{padding:11px 26px;background:var(--text);border:none;border-radius:var(--r3);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+.chat-fid-btn:hover{opacity:.88;transform:translateY(-1px);}
+[data-theme="light"] .chat-fid-btn{color:#FDFAF5;}
+.chat-fid-fallback{font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.chat-fid-fallback:hover{color:var(--text-m);}
+.alerts-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;}
+.alerts-overlay.hidden{display:none;}
+.alerts-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r4);width:520px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+.alerts-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.5;}
+.alerts-head{padding:20px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.alerts-title{font-family:var(--display);font-size:17px;color:var(--text);font-weight:600;flex:1;}
+.alerts-close{width:30px;height:30px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text-m);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;}
+.alerts-close:hover{border-color:var(--red);color:var(--red);}
+.alerts-body{flex:1;overflow-y:auto;padding:14px;}
+.alert-item{background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r3);padding:14px;margin-bottom:10px;display:flex;gap:14px;position:relative;overflow:hidden;}
+.alert-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);}
+.alert-photo{width:60px;height:60px;border-radius:var(--r2);object-fit:cover;flex-shrink:0;background:var(--bg-tri);}
+.alert-photo-placeholder{width:60px;height:60px;border-radius:var(--r2);background:var(--bg-tri);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.alert-info{flex:1;min-width:0;}
+.alert-reason{font-size:12.5px;font-weight:600;color:var(--red);margin-bottom:3px;}
+.alert-time{font-family:var(--mono);font-size:10px;color:var(--text-m);margin-bottom:6px;}
+.alert-dl{padding:5px 12px;background:transparent;border:1px solid var(--border);border-radius:99px;color:var(--text-m);font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.alert-dl:hover{border-color:var(--gold);color:var(--gold);}
+.no-alerts{text-align:center;padding:40px 20px;color:var(--text-f);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
+#page-settings{background:var(--bg);}
+.sett-shell{width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.sett-topbar{height:56px;background:var(--bg-alt);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;}
+.sett-back-btn{padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:99px;color:var(--text-m);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25px;}
+.sett-back-btn:hover{border-color:var(--gold);color:var(--gold);}
+.sett-title{font-family:var(--display);font-size:15px;font-weight:600;color:var(--text);flex:1;}
+.sett-body{flex:1;overflow-y:auto;padding:24px;max-width:700px;margin:0 auto;width:100%;}
+.sett-section{margin-bottom:24px;}
+.sett-section-title{font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.24em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.sett-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.sett-profile-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r4);padding:24px;display:flex;align-items:center;gap:18px;position:relative;overflow:hidden;}
+.sett-profile-card::after{content:'';position:absolute;top:0;right:0;width:200px;height:100%;background:radial-gradient(ellipse at 100% 50%,var(--goldg),transparent);pointer-events:none;}
+.sett-av-big{width:70px;height:70px;border-radius:var(--r4);background:linear-gradient(135deg,var(--bg-sec),var(--bg-tri));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:28px;color:var(--gold);font-weight:700;flex-shrink:0;}
+.sett-uname{font-family:var(--display);font-size:22px;color:var(--text);letter-spacing:-.01em;font-weight:300;}
+.sett-uid{font-family:var(--mono);font-size:10px;color:var(--text-m);letter-spacing:.12em;text-transform:uppercase;margin-top:2px;}
+.sett-joined{font-size:12px;color:var(--text-f);margin-top:4px;}
+.sett-row{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r3);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s;margin-bottom:6px;position:relative;overflow:hidden;}
+.sett-row::after{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:var(--goldg);transition:width .35s;}
+.sett-row:hover{border-color:var(--text-f);}
+.sett-row:hover::after{width:3px;}
+.sett-row-ico{width:36px;height:36px;border-radius:var(--r2);background:var(--bg-sec);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.sett-row-label{flex:1;}
+.sett-row-title{font-size:13.5px;color:var(--text);font-weight:500;}
+.sett-row-sub{font-size:11.5px;color:var(--text-m);margin-top:2px;}
+.sett-row-arr{color:var(--text-f);font-size:14px;}
+.sett-toggle{width:40px;height:22px;border-radius:99px;background:var(--bg-sec);border:1px solid var(--border);position:relative;cursor:pointer;transition:all .3s;flex-shrink:0;}
+.sett-toggle.on{background:var(--green);border-color:var(--green);}
+.sett-toggle::after{content:'';position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .3s;}
+.sett-toggle.on::after{transform:translateX(18px);}
+.cpw-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.8);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;}
+.cpw-overlay.hidden{display:none;}
+.cpw-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r4);padding:32px;width:380px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+.cpw-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45;}
+.cpw-title{font-family:var(--display);font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.cpw-sub{font-size:12.5px;color:var(--text-m);margin-bottom:20px;}
+.cpw-label{font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.2em;text-transform:uppercase;margin-bottom:7px;}
+.cpw-inp{width:100%;padding:11px 14px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r3);color:var(--text);font-family:var(--mono);font-size:18px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:14px;transition:all .3s;}
+.cpw-inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--golds);}
+.cpw-inp::placeholder{color:var(--text-f);letter-spacing:6px;}
+.cpw-btns{display:flex;gap:8px;}
+.cpw-btn{flex:1;padding:12px;background:var(--text);border:none;border-radius:var(--r2);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+[data-theme="light"] .cpw-btn{color:#FDFAF5;}
+.cpw-btn:hover{opacity:.86;transform:translateY(-1px);}
+.cpw-btn.sec{background:transparent;border:1px solid var(--border);color:var(--text-m);}
+.cpw-btn.sec:hover{border-color:var(--text-m);color:var(--text);}
+.cpw-err{font-family:var(--mono);font-size:9.5px;color:var(--red);text-align:center;margin-top:8px;min-height:14px;letter-spacing:.06em;}
+.apik-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;}
+.apik-overlay.hidden{display:none;}
+.apik-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r4);padding:30px;width:400px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+.apik-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5;}
+.apik-title{font-family:var(--display);font-size:17px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.apik-sub{font-size:12.5px;color:var(--text-m);margin-bottom:18px;line-height:1.7;}
+.apik-inp{width:100%;padding:11px 14px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r3);color:var(--text);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px;transition:all .3s;}
+.apik-inp:focus{border-color:var(--gold);}
+.apik-note{font-size:11px;color:var(--text-f);margin-bottom:16px;}
+.apik-note a{color:var(--gold);}
+.apik-btns{display:flex;gap:8px;}
+.apik-btn{flex:1;padding:12px;background:var(--text);border:none;border-radius:var(--r2);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+[data-theme="light"] .apik-btn{color:#FDFAF5;}
+.apik-btn:hover{opacity:.86;}
+.apik-btn.sec{background:transparent;border:1px solid var(--border);color:var(--text-m);}
+.apik-btn.sec:hover{border-color:var(--text-m);color:var(--text);}
+.apik-status{font-family:var(--mono);font-size:10px;color:var(--green);margin-top:10px;min-height:14px;letter-spacing:.06em;}
+
+@media(max-width:700px){.prof-cards{flex-direction:column;}.prof-card{width:300px;}.cp{width:240px;}}
+</style>
+<base target="_blank">
+</head>
+<body>
+<button id="theme-btn" onclick="toggleTheme()">🌙</button>
+<div id="notif-stack"></div>
+
+<!-- ══ IMAGE GEN MODAL ══ -->
+<div class="overlay hidden" id="imgen-modal" onclick="closeImgen()">
+  <div class="igmodal" onclick="event.stopPropagation()">
+    <div style="font-family:var(--display);font-size:17px;font-weight:600;margin-bottom:4px;color:var(--text);">AI Image Studio</div>
+    <div style="font-size:12.5px;color:var(--text-b);margin-bottom:14px;">Describe anything — rendered instantly.</div>
+    <div class="ig-canvas" id="ig-preview"><div class="ig-empty">Awaiting creative direction…</div></div>
+    <input id="ig-prompt" class="ig-inp" type="text" placeholder="A futuristic cityscape at night…" onkeydown="if(event.key==='Enter')generateImage()"/>
+    <div class="btn-row">
+      <button onclick="generateImage()" class="gbtn">✨ Generate</button>
+      <button onclick="closeImgen()" class="gbtn sec">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHANGE PASSWORD MODAL ══ -->
+<div class="cpw-overlay hidden" id="cpw-modal">
+  <div class="cpw-card">
+    <div class="cpw-title">Change Safe Key</div>
+    <div class="cpw-sub">Enter a new 6-digit terminal key.</div>
+    <div class="cpw-label">Current Key</div>
+    <input class="cpw-inp" id="cpw-current" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')document.getElementById('cpw-new').focus()"/>
+    <div class="cpw-label">New Key</div>
+    <input class="cpw-inp" id="cpw-new" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')document.getElementById('cpw-confirm').focus()"/>
+    <div class="cpw-label">Confirm New Key</div>
+    <input class="cpw-inp" id="cpw-confirm" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')changePassword()"/>
+    <div class="cpw-err" id="cpw-err"></div>
+    <div class="cpw-btns">
+      <button class="cpw-btn" onclick="changePassword()">Update Key</button>
+      <button class="cpw-btn sec" onclick="closeCpwModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ API KEY MODAL ══ -->
+<div class="apik-overlay hidden" id="apik-modal">
+  <div class="apik-card">
+    <div class="apik-title">Anthropic API Key</div>
+    <div class="apik-sub">Connect Claude AI to power the assistant and messenger auto-replies. Stored only in your browser.</div>
+    <input id="apik-inp" class="apik-inp" type="password" placeholder="sk-ant-api03-…" onkeydown="if(event.key==='Enter')saveApiKey()"/>
+    <div class="apik-note">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+    <div class="apik-btns">
+      <button class="apik-btn" onclick="saveApiKey()">Save Key</button>
+      <button class="apik-btn sec" onclick="closeApikModal()">Cancel</button>
+    </div>
+    <div class="apik-status" id="apik-status"></div>
+  </div>
+</div>
+
+<!-- ══ FIREBASE CONFIG MODAL ══ -->
+<div class="apik-overlay hidden" id="firebase-modal">
+  <div class="apik-card">
+    <div class="apik-title">Firebase Realtime Database</div>
+    <div class="apik-sub">Enter your Firebase project config to enable real-time messaging between users. Create a free project at <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+      <input id="fb-apikey" class="apik-inp" type="text" placeholder="apiKey" style="margin-bottom:0;"/>
+      <input id="fb-domain" class="apik-inp" type="text" placeholder="authDomain (project.firebaseapp.com)" style="margin-bottom:0;"/>
+      <input id="fb-dburl" class="apik-inp" type="text" placeholder="databaseURL (https://project-default-rtdb.firebaseio.com)" style="margin-bottom:0;"/>
+      <input id="fb-project" class="apik-inp" type="text" placeholder="projectId" style="margin-bottom:0;"/>
+      <input id="fb-bucket" class="apik-inp" type="text" placeholder="storageBucket (project.appspot.com)" style="margin-bottom:0;"/>
+      <input id="fb-sender" class="apik-inp" type="text" placeholder="messagingSenderId" style="margin-bottom:0;"/>
+      <input id="fb-appid" class="apik-inp" type="text" placeholder="appId" style="margin-bottom:0;"/>
+    </div>
+    <div class="apik-btns">
+      <button class="apik-btn" onclick="saveFirebaseConfig()">Save Config</button>
+      <button class="apik-btn sec" onclick="closeFirebaseModal()">Cancel</button>
+    </div>
+    <div class="apik-status" id="fb-status"></div>
+  </div>
+</div>
+
+<!-- ══ SECURITY ALERTS PANEL ══ -->
+<div class="alerts-overlay hidden" id="alerts-modal">
+  <div class="alerts-card">
+    <div class="alerts-head">
+      <span style="font-size:20px;">🚨</span>
+      <div class="alerts-title">Security Snapshots</div>
+      <button class="alerts-close" onclick="closeAlertsModal()">✕</button>
+    </div>
+    <div class="alerts-body" id="alerts-body"></div>
+  </div>
+</div>
+
+<!-- ══ FACE ID PAGE ══ -->
+<div class="page" id="page-faceid">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+  <div class="fid-float ff1"><div class="ff-dot green"></div><div><div class="ff-label">Biometric</div><div class="ff-val">Active</div></div></div>
+  <div class="fid-float ff2"><div class="ff-dot gold"></div><div><div class="ff-label">Encryption</div><div class="ff-val">AES-256</div></div></div>
+  <div class="fid-float ff3"><div class="ff-dot blue"></div><div><div class="ff-label">AI Model</div><div class="ff-val">Claude</div></div></div>
+  <div class="fid-card">
+    <div class="fid-brand">
+      <div class="fid-mark">Y</div>
+      <div><div class="fid-name">You N Me AI</div><div class="fid-sub">Private Terminal</div></div>
+    </div>
+    <div class="fid-headline">Face <em>Verification</em></div>
+    <div class="fid-desc">Look at the camera to authenticate. Advanced biometric recognition powered by neural face analysis.</div>
+    <div class="cam-ring-wrap">
+      <div class="cam-outer">
+        <div class="cam-ring-track"></div>
+        <div class="cam-ring-spinner" id="cam-spinner" style="display:none;"></div>
+        <div class="cam-mesh" id="cam-mesh"></div>
+        <div class="cam-video" id="cam-video-wrap" style="display:none;">
+          <video id="fid-video" autoplay muted playsinline></video>
+        </div>
+        <div class="cam-idle" id="cam-idle">
+          <div class="cam-idle-ico">👤</div>
+        </div>
+        <div class="cam-scan-line" id="cam-scan" style="display:none;"></div>
+        <div class="cam-dots">
+          <div class="cam-dot"></div><div class="cam-dot"></div>
+          <div class="cam-dot"></div><div class="cam-dot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="conf-meter" id="conf-meter"><div class="conf-fill" id="conf-fill"></div></div>
+    <div class="fid-status" id="fid-status">Ready to verify — tap Start</div>
+    <div class="fid-err" id="fid-err"></div>
+    <button class="fid-btn" id="fid-btn" onclick="startFaceID()">🔓 Start Face ID</button>
+    <div class="fid-links">
+      <span class="fid-link" onclick="goToSafeKey()">Use Password Instead</span>
+      <span class="fid-link" onclick="goRegister()">New Account</span>
+      <span class="fid-link" onclick="resetAccount()">Reset</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REGISTRATION PAGE ══ -->
+<div class="page out" id="page-register">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+  <div class="reg-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;">
+      <div style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:linear-gradient(135deg,var(--bg-sec),var(--bg-tri));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;color:var(--gold);font-weight:700;">Y</div>
+      <div><div style="font-family:var(--display);font-size:16px;color:var(--text);font-weight:600;">You N Me AI</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-m);letter-spacing:.24em;text-transform:uppercase;">New Account</div></div>
+    </div>
+    <div class="reg-progress"><div class="rp-step active" id="rp0"></div><div class="rp-step" id="rp1"></div><div class="rp-step" id="rp2"></div><div class="rp-step" id="rp3"></div><div class="rp-step" id="rp4"></div></div>
+    <div class="rs active" id="rs-0">
+      <div class="rs-title">Create your <em>profile</em></div>
+      <div class="rs-sub">Your identity inside the terminal.</div>
+      <div class="r-label">Full Name</div>
+      <input class="r-input" id="r-name" type="text" placeholder="Your full name" maxlength="40" onkeydown="if(event.key==='Enter')regNext()"/>
+      <div class="r-label">Username <span style="color:var(--text-f);font-size:8px;">(auto-assigned #ID)</span></div>
+      <input class="r-input" id="r-user" type="text" placeholder="@handle (e.g. roshan)" maxlength="20" onkeydown="if(event.key==='Enter')regNext()"/>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text-f);margin-top:-10px;margin-bottom:10px;">A unique 4-digit ID will be appended automatically, e.g. @roshan#4829</div>
+      <div class="r-error" id="re-0"></div>
+      <button class="r-btn" onclick="regNext()">→ Continue</button>
+    </div>
+    <div class="rs" id="rs-1">
+      <div class="rs-title">Set your <em>safe key</em></div>
+      <div class="rs-sub">A 6-digit key as terminal password fallback.</div>
+      <div class="r-label">6-Digit Key</div>
+      <input class="r-input code" id="r-key" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·"/>
+      <div class="r-label">Confirm Key</div>
+      <input class="r-input code" id="r-key2" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" onkeydown="if(event.key==='Enter')regNext()"/>
+      <div class="r-error" id="re-1"></div>
+      <button class="r-btn" onclick="regNext()">→ Continue</button>
+    </div>
+    <div class="rs" id="rs-2">
+      <div class="rs-title">Enroll <em>Face ID</em></div>
+      <div class="rs-sub">Register your face as the primary biometric key.</div>
+      <div class="reg-cam-wrap">
+        <div class="spin" id="reg-spin" style="display:none;"></div>
+        <video id="fe-video" autoplay muted playsinline></video>
+      </div>
+      <div id="fe-status" style="font-family:var(--mono);font-size:9.5px;color:var(--text-m);letter-spacing:.16em;text-transform:uppercase;text-align:center;margin-bottom:14px;min-height:14px;">Click Start Camera to begin</div>
+      <div class="r-error" id="re-2"></div>
+      <button class="r-btn" id="fe-btn" onclick="feAction()">📷 Start Camera</button>
+      <button class="r-btn sec" onclick="skipFace()" style="margin-top:8px;">Skip for now</button>
+    </div>
+    <div class="rs" id="rs-3">
+      <div class="done-circle">✅</div>
+      <div class="rs-title" style="text-align:center;">Welcome to <em>You N Me AI</em></div>
+      <div class="rs-sub" style="text-align:center;margin-bottom:0;">Your terminal is secured and ready.</div>
+      <button class="r-btn" onclick="regComplete()" style="margin-top:20px;">🚀 Enter Terminal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SAFE KEY PAGE ══ -->
+<div class="page out" id="page-safekey">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
+  <div class="fid-card" style="max-width:400px;">
+    <div class="fid-brand">
+      <div class="fid-mark">Y</div>
+      <div><div class="fid-name">You N Me AI</div><div class="fid-sub">Safe Key Fallback</div></div>
+    </div>
+    <div class="fid-headline">Enter <em>Safe Key</em></div>
+    <div id="sk-welcome" style="font-size:13px;color:var(--text-m);margin-bottom:20px;line-height:1.7;">Enter your 6-digit terminal key.</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;">6-Digit Key</div>
+    <input style="width:100%;padding:14px 18px;background:var(--bg-sec);border:1px solid var(--border);border-radius:var(--r3);color:var(--text);font-family:var(--mono);font-size:24px;font-weight:400;letter-spacing:16px;text-align:center;outline:none;transition:all .3s;caret-color:var(--gold);" id="sk-input" type="password" inputmode="numeric" maxlength="6" placeholder="· · · · · ·" oninput="skAutoSubmit()" onkeydown="if(event.key==='Enter')verifyKey()" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+    <button style="width:100%;padding:14px;background:var(--text);border:none;border-radius:var(--r3);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;margin-top:14px;transition:all .3s;" onclick="verifyKey()">🔓 Unlock Terminal</button>
+    <div id="sk-error" style="font-family:var(--mono);font-size:10px;color:var(--red);text-align:center;margin-top:10px;min-height:14px;letter-spacing:.08em;text-transform:uppercase;"></div>
+    <div style="text-align:center;margin-top:14px;">
+      <span class="fid-link" onclick="goPage('faceid')">← Back to Face ID</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE SELECTION PAGE ══ -->
+<div class="page out" id="page-profiles">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+  <div class="prof-wrap">
+    <div class="prof-head">
+      <div class="prof-title">Choose your <em>workspace</em></div>
+      <div class="prof-sub">You N Me AI · All systems nominal</div>
+    </div>
+    <div class="prof-cards">
+      <div class="prof-card" onclick="goPage('ai')">
+        <div class="prof-ico-ring"><div class="prof-ico">🤖</div></div>
+        <div class="prof-label">AI Assistant</div>
+        <div class="prof-desc">Chrome humanoid AI with voice in English, Telugu &amp; Hindi. Powered by Claude.</div>
+        <div class="prof-tag">Sonnet · Voice · Multi-lang</div>
+      </div>
+      <div class="prof-card" onclick="openMessenger()">
+        <div class="prof-ico-ring"><div class="prof-ico">💬</div></div>
+        <div class="prof-label">Messenger</div>
+        <div class="prof-desc">Face ID-gated messaging with AES-256 encryption, ghost mode &amp; security alerts.</div>
+        <div class="prof-tag">Face ID · E2E · AES-256</div>
+      </div>
+      <div class="prof-card" onclick="goPage('settings')">
+        <div class="prof-ico-ring"><div class="prof-ico">⚙️</div></div>
+        <div class="prof-label">Profile</div>
+        <div class="prof-desc">Manage your account, change password, Face ID settings and API keys.</div>
+        <div class="prof-tag">Settings · Security</div>
+      </div>
+    </div>
+    <div class="prof-footer">
+      <div class="prof-user-av" id="prof-av">?</div>
+      <div>
+        <div class="prof-user-info" id="prof-name">Welcome</div>
+        <div class="prof-user-sub" id="prof-uid">@—</div>
+      </div>
+      <button class="prof-lock-btn" onclick="lockApp()">🔒 Lock</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI ASSISTANT PAGE ══ -->
+<div class="page out" id="page-ai">
+  <div class="ai-shell" style="position:relative;">
+    <div class="ai-bg"></div><div class="ai-grid"></div>
+    <div class="ai-topbar">
+      <button class="ai-back-btn" onclick="goPage('profiles')">← Back</button>
+      <div style="flex:1;">
+        <div class="ai-title" id="ai-panel-title">You N Me AI</div>
+        <div class="ai-title-tag">Chrome Humanoid · Voice · EN / TE / HI</div>
+      </div>
+      <button class="ai-t-btn" onclick="openImgen()">✨ Image</button>
+      <button class="ai-t-btn" onclick="clearRobotChat()">↺ Reset</button>
+    </div>
+    <div class="ai-name-bar">
+      <span class="ai-name-label">Name your AI</span>
+      <input class="ai-name-input" id="robot-name-input" type="text" placeholder="e.g. ARIA, MAX…" maxlength="20"/>
+      <button class="ai-name-save" onclick="saveRobotName()">Save Name</button>
+      <span id="robot-name-display" style="font-family:var(--mono);font-size:9.5px;color:rgba(74,158,255,.35);margin-left:6px;"></span>
+    </div>
+    <div class="ai-controls">
+      <span class="ctrl-label">Voice</span>
+      <div class="ctrl-seg" id="voiceSeg">
+        <button class="ctrl-btn active" onclick="setVoiceType('male',this)">Male</button>
+        <button class="ctrl-btn" onclick="setVoiceType('female',this)">Female</button>
+      </div>
+      <span class="ctrl-label" style="margin-left:8px;">Language</span>
+      <div class="ctrl-seg" id="langSeg">
+        <button class="ctrl-btn active" onclick="setLang('en',this)">English</button>
+        <button class="ctrl-btn" onclick="setLang('te',this)">Telugu</button>
+        <button class="ctrl-btn" onclick="setLang('hi',this)">Hindi</button>
+      </div>
+      <span id="voice-status"></span>
+    </div>
+    <div class="robot-stage">
+      <div class="speech-orb" id="speechOrb">Initializing… I am ready to assist you.</div>
+      <div class="think-dots-ai" id="thinkDotsAi"><div class="tdai"></div><div class="tdai"></div><div class="tdai"></div></div>
+      <div class="voice-waves" id="voiceWaves"><div class="vw"></div><div class="vw"></div><div class="vw"></div><div class="vw"></div><div class="vw"></div><div class="vw"></div><div class="vw"></div></div>
+      <div id="roboRoot" class="robo-root" style="position:relative;width:240px;height:330px;filter:drop-shadow(0 20px 50px rgba(74,158,255,.35));animation:robFloat 4s ease-in-out infinite;">
+        <svg id="roboSvg" viewBox="0 0 260 360" width="240" height="330" style="overflow:visible;">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4a9eff;stop-opacity:1"/><stop offset="50%" style="stop-color:#2a6fc7;stop-opacity:1"/><stop offset="100%" style="stop-color:#1a4a8a;stop-opacity:1"/></linearGradient>
+            <linearGradient id="headGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#5ab0ff;stop-opacity:1"/><stop offset="50%" style="stop-color:#3a8ae0;stop-opacity:1"/><stop offset="100%" style="stop-color:#1e5aa0;stop-opacity:1"/></linearGradient>
+            <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#00e8ff;stop-opacity:1"/><stop offset="70%" style="stop-color:#00a8cc;stop-opacity:.8"/><stop offset="100%" style="stop-color:#006688;stop-opacity:.4"/></radialGradient>
+            <radialGradient id="eyeGlowDim" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#00e8ff;stop-opacity:.3"/><stop offset="100%" style="stop-color:#006688;stop-opacity:.1"/></radialGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g transform="translate(75,45)"><line x1="0" y1="0" x2="-12" y2="-35" stroke="#4a9eff" stroke-width="2.5" stroke-linecap="round"/><circle cx="-12" cy="-35" r="6" fill="url(#eyeGlow)" filter="url(#glow)" id="antLightL"/></g>
+          <g transform="translate(185,45)"><line x1="0" y1="0" x2="12" y2="-35" stroke="#4a9eff" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="-35" r="6" fill="url(#eyeGlow)" filter="url(#glow)" id="antLightR"/></g>
+          <ellipse cx="130" cy="95" rx="75" ry="65" fill="url(#headGrad)" stroke="#6ab8ff" stroke-width="2"/>
+          <ellipse cx="130" cy="75" rx="50" ry="25" fill="rgba(255,255,255,.08)"/>
+          <g id="eyeLeftGroup" transform="translate(95,90)">
+            <circle cx="0" cy="0" r="22" fill="#0a1628" stroke="#2a8ae0" stroke-width="2"/>
+            <circle cx="0" cy="0" r="18" fill="url(#eyeGlow)" id="eyeLeftGlow" filter="url(#glow)"/>
+            <circle cx="0" cy="0" r="14" fill="#00e8ff" id="eyeLeftCore" opacity=".9"/>
+            <circle cx="5" cy="-5" r="4" fill="#fff" opacity=".6"/>
+            <path id="eyelidL" d="M -22,0 A 22,22 0 0,0 22,0" fill="#1e5aa0" opacity="0"/>
+          </g>
+          <g id="eyeRightGroup" transform="translate(165,90)">
+            <circle cx="0" cy="0" r="22" fill="#0a1628" stroke="#2a8ae0" stroke-width="2"/>
+            <circle cx="0" cy="0" r="18" fill="url(#eyeGlow)" id="eyeRightGlow" filter="url(#glow)"/>
+            <circle cx="0" cy="0" r="14" fill="#00e8ff" id="eyeRightCore" opacity=".9"/>
+            <circle cx="5" cy="-5" r="4" fill="#fff" opacity=".6"/>
+          </g>
+          <g id="mouthGroup" transform="translate(130,135)">
+            <rect x="-30" y="-8" width="60" height="16" rx="8" fill="#0a1628" stroke="#2a8ae0" stroke-width="1.5"/>
+            <rect id="mb1" x="-22" y="-4" width="4" height="8" rx="2" fill="#00e8ff" opacity=".5"/>
+            <rect id="mb2" x="-14" y="-4" width="4" height="8" rx="2" fill="#00e8ff" opacity=".5"/>
+            <rect id="mb3" x="-6" y="-4" width="4" height="8" rx="2" fill="#00e8ff" opacity=".5"/>
+            <rect id="mb4" x="2" y="-4" width="4" height="8" rx="2" fill="#00e8ff" opacity=".5"/>
+            <rect id="mb5" x="10" y="-4" width="4" height="8" rx="2" fill="#00e8ff" opacity=".5"/>
+            <rect id="mb6" x="18" y="-4" width="4" height="8" rx="2" fill="#00e8ff" opacity=".5"/>
+          </g>
+          <rect x="115" y="155" width="30" height="20" rx="5" fill="#2a6fc7" stroke="#4a9eff" stroke-width="1.5"/>
+          <rect x="75" y="175" width="110" height="100" rx="20" fill="url(#bodyGrad)" stroke="#6ab8ff" stroke-width="2"/>
+          <rect x="95" y="195" width="70" height="50" rx="10" fill="#0a1628" stroke="#2a8ae0" stroke-width="1.5"/>
+          <rect x="105" y="205" width="50" height="6" rx="3" fill="#00e8ff" opacity=".4" id="chestBar1"/>
+          <rect x="105" y="216" width="35" height="6" rx="3" fill="#00e8ff" opacity=".4" id="chestBar2"/>
+          <rect x="105" y="227" width="42" height="6" rx="3" fill="#00e8ff" opacity=".4" id="chestBar3"/>
+          <circle cx="130" cy="245" r="8" fill="#00e8ff" opacity=".6" filter="url(#glow)" id="heartLight"/>
+          <g id="armLeft" transform="translate(65,190)"><rect x="-15" y="0" width="20" height="55" rx="10" fill="#2a6fc7" stroke="#4a9eff" stroke-width="1.5"/><circle cx="-5" cy="55" r="12" fill="#1a4a8a" stroke="#4a9eff" stroke-width="1.5"/></g>
+          <g id="armRight" transform="translate(195,190)"><rect x="-5" y="0" width="20" height="55" rx="10" fill="#2a6fc7" stroke="#4a9eff" stroke-width="1.5"/><circle cx="5" cy="55" r="12" fill="#1a4a8a" stroke="#4a9eff" stroke-width="1.5"/></g>
+          <g transform="translate(100,275)"><rect x="-8" y="0" width="22" height="45" rx="8" fill="#2a6fc7" stroke="#4a9eff" stroke-width="1.5"/><path d="M -12,40 L 18,40 L 20,55 L -14,55 Z" fill="#1a4a8a" stroke="#4a9eff" stroke-width="1.5"/></g>
+          <g transform="translate(160,275)"><rect x="-14" y="0" width="22" height="45" rx="8" fill="#2a6fc7" stroke="#4a9eff" stroke-width="1.5"/><path d="M -18,40 L 12,40 L 14,55 L -20,55 Z" fill="#1a4a8a" stroke="#4a9eff" stroke-width="1.5"/></g>
+        </svg>
+      </div>
+      <div id="robot-name-badge"></div>
+    </div>
+    <div class="ai-input-bar">
+      <div class="ai-irow">
+        <button class="ai-ib ai-ib-mic" id="ai-mic-btn" onclick="toggleAiMic()" title="Voice input">🎤</button>
+        <div class="ai-iwrap">
+          <textarea class="ai-cta" id="ai-ta" placeholder="Ask anything — I will respond vocally…" rows="1" onkeydown="aiKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="ai-ib ai-ib-send" onclick="sendAI()" title="Send">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MESSENGER PAGE ══ -->
+<div class="page out" id="page-msg">
+  <div class="msg-shell">
+    <div class="msg-topbar">
+      <button class="msg-back-btn" onclick="goPage('profiles')">← Back</button>
+      <div class="msg-topbar-title">💬 Messenger</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.18em;text-transform:uppercase;">AES-256 · Face ID</div>
+      <button class="msg-alerts-btn" onclick="openAlertsModal()">🚨 Alerts <span id="alerts-count" style="display:none;background:var(--red);color:#fff;border-radius:99px;padding:1px 6px;font-size:9px;font-family:var(--mono);"></span></button>
+    </div>
+    <div class="msg-content">
+      <div class="cp">
+        <div class="my-id-banner" onclick="copyMyId()" title="Tap to copy your ID">
+          <div>
+            <div class="my-id-label">Your ID</div>
+            <div class="my-id-value" id="my-id-display">@loading…</div>
+          </div>
+          <div class="my-id-copy">📋</div>
+        </div>
+        <div class="cp-tabs">
+          <div class="cp-tab active" id="tab-chats" onclick="switchTab('chats')">Chats<span class="cp-tab-badge" id="badge-chats" style="display:none;"></span></div>
+          <div class="cp-tab" id="tab-contacts" onclick="switchTab('contacts')">Contacts</div>
+          <div class="cp-tab" id="tab-blocked" onclick="switchTab('blocked')">Blocked<span class="cp-tab-badge" id="badge-blocked" style="display:none;"></span></div>
+        </div>
+        <div class="cp-head" id="cp-search-bar">
+          <div class="search-wrap">
+            <input class="cp-search" type="text" placeholder="Search…" oninput="filterContacts(this.value)"/>
+          </div>
+        </div>
+        <div class="contact-add hidden" id="contact-add-bar">
+          <input class="contact-add-inp" id="contact-search-inp" type="text" placeholder="Search @username#1234…" onkeydown="if(event.key==='Enter')addContact()"/>
+          <button class="contact-add-btn" onclick="addContact()">+ Add</button>
+        </div>
+        <div class="cp-list" id="clist"></div>
+      </div>
+      <div class="cc" id="chat-main">
+        <div class="no-chat" id="no-chat-state">
+          <div class="no-chat-ico">💬</div>
+          <div class="no-chat-title">Select a conversation</div>
+          <div class="no-chat-sub">AES-256 encrypted · Face ID protected</div>
+        </div>
+        <div id="chat-active" class="hidden" style="display:flex;flex-direction:column;height:100%;overflow:hidden;position:relative;">
+          <div class="chat-fid-overlay" id="chat-fid-gate">
+            <div class="chat-fid-title">Verify <em>Identity</em></div>
+            <div class="chat-fid-sub">Face scan required to open this conversation.</div>
+            <div class="chat-fid-ring" id="chat-fid-ring">
+              <div class="chat-fid-ring-track"></div>
+              <div class="chat-fid-spinner" id="chat-fid-spinner" style="display:none;"></div>
+              <div class="chat-fid-video-bg">
+                <video id="chat-fid-video" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1);border-radius:50%;"></video>
+              </div>
+              <div class="chat-fid-idle" id="chat-fid-idle">👤</div>
+            </div>
+            <div class="chat-fid-status" id="chat-fid-status">Tap to scan</div>
+            <button class="chat-fid-btn" id="chat-fid-btn" onclick="startChatFaceID()">🔓 Scan Face</button>
+            <span class="chat-fid-fallback" onclick="skipChatFaceID()">Camera unavailable? Open directly</span>
+          </div>
+          <div class="ghost-overlay hidden" id="ghost-overlay">
+            <div class="ghost-ico">👻</div>
+            <div class="ghost-title">Conversation Hidden</div>
+            <div class="ghost-sub">Identity verification required<br>Please verify to continue</div>
+            <button class="ghost-verify-btn" onclick="verifyGhostOwner()">🔓 Verify to View</button>
+          </div>
+          <div id="chat-content-wrap" class="hidden" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+            <div class="cc-head">
+              <div class="cc-av" id="cz-av"></div>
+              <div style="flex:1;min-width:0;">
+                <div id="cz-name" class="cc-name">—</div>
+                <div id="cz-status" class="cc-status">—</div>
+                <div id="cz-uid" style="font-family:var(--mono);font-size:9px;color:var(--text-f);"></div>
+              </div>
+              <div class="cc-actions">
+                <button class="cc-btn block-btn" title="Block contact" onclick="blockCurrentContact()">🚫</button>
+                <button class="cc-btn" title="Search">🔍</button>
+                <button class="cc-btn" title="More">⋯</button>
+              </div>
+            </div>
+            <div class="chat-area" id="msg-body"></div>
+            <div class="ibar">
+              <div class="chip-row" id="msg-chips"></div>
+              <div class="irow">
+                <button class="ib ib-ghost" title="Emoji" style="border:1px solid var(--border);">😊</button>
+                <label class="ib ib-ghost" title="Attach" style="cursor:pointer;border:1px solid var(--border);">
+                  📎<input type="file" id="msg-file" multiple accept="image/*,.pdf,.txt" onchange="handleMsgFile(this)" style="display:none;"/>
+                </label>
+                <div class="iwrap">
+                  <textarea class="cta" id="msg-ta" placeholder="Message…" rows="1" onkeydown="msgKey(event)" oninput="autoResize(this)"></textarea>
+                </div>
+                <button class="ib ib-ghost" id="msg-voice-btn" title="Voice note" onclick="toggleVoiceNote()" style="border:1px solid var(--border);">🎙</button>
+                <button class="ib ib-send" onclick="sendMsg()">➤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS PAGE ══ -->
+<div class="page out" id="page-settings">
+  <div class="sett-shell">
+    <div class="sett-topbar">
+      <button class="sett-back-btn" onclick="goPage('profiles')">← Back</button>
+      <div class="sett-title">Profile & Settings</div>
+    </div>
+    <div class="sett-body">
+      <div class="sett-section">
+        <div class="sett-section-title">Account</div>
+        <div class="sett-profile-card">
+          <div class="sett-av-big" id="sett-av">?</div>
+          <div>
+            <div class="sett-uname" id="sett-uname">—</div>
+            <div class="sett-uid" id="sett-uid">@—</div>
+            <div id="sett-nexus-id" style="font-family:var(--mono);font-size:10px;color:var(--gold);margin-top:2px;"></div>
+            <div class="sett-joined" id="sett-joined">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-section-title">Security</div>
+        <div class="sett-row" onclick="openCpwModal()">
+          <div class="sett-row-ico">🔑</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title">Change Safe Key</div>
+            <div class="sett-row-sub">Update your 6-digit terminal password</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+        <div class="sett-row" onclick="reEnrollFace()">
+          <div class="sett-row-ico">👤</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title">Re-enroll Face ID</div>
+            <div class="sett-row-sub" id="sett-face-status">Not enrolled</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-section-title">Security Snapshots</div>
+        <div class="sett-row" onclick="openAlertsModal()">
+          <div class="sett-row-ico">📸</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title">View Intruder Snapshots</div>
+            <div class="sett-row-sub" id="sett-snapshot-count">No unauthorized access attempts</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+        <div class="sett-row" onclick="clearAllSnapshots()">
+          <div class="sett-row-ico">🗑️</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title" style="color:var(--red);">Clear All Snapshots</div>
+            <div class="sett-row-sub">Permanently delete all captured intruder photos</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-row" onclick="openApikModal()">
+          <div class="sett-row-ico">🔗</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title">Anthropic API Key</div>
+            <div class="sett-row-sub" id="sett-api-status">Not configured</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+        <div class="sett-row" onclick="openFirebaseModal()">
+          <div class="sett-row-ico">🔥</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title">Firebase Config</div>
+            <div class="sett-row-sub" id="sett-firebase-status">Not configured — required for real messaging</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-section-title">Appearance</div>
+        <div class="sett-row" onclick="toggleTheme()">
+          <div class="sett-row-ico" id="sett-theme-ico">🌙</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title">Theme</div>
+            <div class="sett-row-sub" id="sett-theme-lbl">Dark mode</div>
+          </div>
+          <div class="sett-toggle on" id="sett-theme-toggle" style="pointer-events:none;"></div>
+        </div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-section-title">Danger Zone</div>
+        <div class="sett-row" onclick="lockApp()" style="border-color:rgba(232,84,84,.15);">
+          <div class="sett-row-ico">🔒</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title" style="color:var(--amber);">Lock Terminal</div>
+            <div class="sett-row-sub">Return to Face ID screen</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+        <div class="sett-row" onclick="resetAccount()" style="border-color:rgba(232,84,84,.15);">
+          <div class="sett-row-ico">🗑️</div>
+          <div class="sett-row-label">
+            <div class="sett-row-title" style="color:var(--red);">Reset Account</div>
+            <div class="sett-row-sub">Erase all data permanently</div>
+          </div>
+          <div class="sett-row-arr">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ══ CONSTANTS ══
+const USER_KEY      = 'nexus_v4_user';
+const ROBOT_KEY     = 'nexus_robot_name';
+const VOICE_KEY     = 'nexus_robot_voice';
+const LANG_KEY      = 'nexus_robot_lang';
+const CHATS_KEY     = 'nexus_chats_enc_v5';
+const API_KEY_STORE = 'nexus_anthropic_key';
+const ALERTS_KEY    = 'nexus_security_alerts';
+const BLOCKED_KEY   = 'nexus_blocked_contacts';
+const CRYPTO_KEY_STORE = 'nexus_aes_key';
+const MY_CONTACTS_KEY = 'nexus_my_contacts_v1';
+const FIREBASE_CONFIG_KEY = 'nexus_firebase_config';
+
+// ══ STATE ══
+let isDark = true;
+let currentUser = null;          // always kept in sync — never let this go stale
+let currentContact = null;
+let currentTab = 'chats';
+let isAiProcessing = false, isListening = false;
+let recognition = null, currentUtterance = null;
+let mouthTick = null, blinkInterval = null, chestInterval = null;
+let conversationHistory = [];
+let robotName = 'YOU N ME AI', voiceType = 'male', langChoice = 'en';
+let voiceRecording = false;
+let currentGeneratedImage = null;
+let faceapi = null, faceModelsLoaded = false;
+let faceEnrollStream = null, fidStream = null, chatFidStream = null;
+let feState = 'idle';
+let fidState = 'idle';
+let chatFidScanActive = false;
+let cryptoKey = null;
+let cameraAvailable = null;
+let firebaseApp = null, firebaseDb = null;
+let activeListeners = {};
+
+const langCfg = {
+  en:{ code:'en-US', name:'English', ph:'Ask anything — I will respond vocally…' },
+  te:{ code:'te-IN', name:'Telugu',  ph:'తెలుగులో అడగండి…' },
+  hi:{ code:'hi-IN', name:'Hindi',   ph:'हिंदी में पूछें…' }
+};
+
+const CONTACTS = [
+  { id:'alex',   name:'Alex Kumar',   uid:'@alexkumar#2847', emoji:'👨‍💻', color:'#3a7bd5', status:'online',  role:'Work',   unread:2 },
+  { id:'priya',  name:'Priya Sharma', uid:'@priyasharma#9321', emoji:'👩‍🎤', color:'#9b59b6', status:'online',  role:'Friend', unread:1 },
+  { id:'devgrp', name:'Dev Team 🚀',  uid:'@devteam#5500',  emoji:'💻', color:'#27ae60', status:'away',    role:'Group',  unread:3 },
+  { id:'mom',    name:'Mom',          uid:'@mom#1001',      emoji:'👩', color:'#e67e22', status:'offline', role:'Family', unread:0 },
+];
+
+const SEED_MSGS = {};
+
+const USER_DATABASE = [
+  { id:'roshan', name:'Roshan Kumar', uid:'@roshan#5634', emoji:'👨‍💻', color:'#e74c3c', status:'online', role:'Friend' },
+  { id:'prash', name:'Prashanth Reddy', uid:'@prash#0000', emoji:'🧑‍🚀', color:'#3498db', status:'online', role:'Work' },
+  { id:'neha', name:'Neha Sharma', uid:'@neha#7821', emoji:'👩‍🎨', color:'#9b59b6', status:'away', role:'Friend' },
+  { id:'vikram', name:'Vikram Patel', uid:'@vikram#4521', emoji:'🧑‍💼', color:'#1abc9c', status:'offline', role:'Work' },
+  { id:'ananya', name:'Ananya Iyer', uid:'@ananya#9912', emoji:'👩‍🔬', color:'#f39c12', status:'online', role:'Family' },
+  { id:'kiran', name:'Kiran Rao', uid:'@kiran#3345', emoji:'🧑‍🌾', color:'#27ae60', status:'away', role:'Friend' },
+  { id:'sneha', name:'Sneha Gupta', uid:'@sneha#8765', emoji:'👩‍⚕️', color:'#e91e63', status:'online', role:'Work' },
+  { id:'arjun', name:'Arjun Nair', uid:'@arjun#1234', emoji:'🧑‍🎤', color:'#673ab7', status:'offline', role:'Friend' },
+  { id:'divya', name:'Divya Krishnan', uid:'@divya#5678', emoji:'👩‍🏫', color:'#ff5722', status:'online', role:'Family' },
+  { id:'rahul', name:'Rahul Mehta', uid:'@rahul#9999', emoji:'🧑‍🔧', color:'#795548', status:'away', role:'Work' },
+];
+
+// ══ SELF-HEALING: migrate old accounts missing uid ══
+function migrateUserIfNeeded() {
+  const u = getUser();
+  if(!u) return;
+  let changed = false;
+  // If uid is missing, null, or '0000' from a broken registration, assign a real one
+  if(!u.uid || u.uid === '0000' || u.uid === 0) {
+    u.uid = generateUID();
+    changed = true;
+  }
+  // If username is missing, derive from name
+  if(!u.username && u.name) {
+    u.username = u.name.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g,'');
+    changed = true;
+  }
+  if(changed) {
+    saveUser(u);
+    console.log('[YOU N ME AI] Migrated user account:', u);
+  }
+}
+
+// ══ INIT ══
+window.addEventListener('load', async () => {
+  loadRobotPrefs();
+  await initCryptoKey();
+  await detectCameraAvailability();
+  migrateUserIfNeeded(); // ← heal any broken existing accounts
+  if(window.speechSynthesis){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+  checkUser();
+});
+
+async function detectCameraAvailability() {
+  try {
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { cameraAvailable=false; return; }
+    if(location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      cameraAvailable = false; return;
+    }
+    cameraAvailable = true;
+  } catch(e) { cameraAvailable = false; }
+}
+
+// ══ AES-256-GCM ENCRYPTION ══
+async function initCryptoKey() {
+  try {
+    const stored = localStorage.getItem(CRYPTO_KEY_STORE);
+    if(stored) {
+      const raw = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
+      cryptoKey = await crypto.subtle.importKey('raw', raw, {name:'AES-GCM'}, false, ['encrypt','decrypt']);
+    } else {
+      cryptoKey = await crypto.subtle.generateKey({name:'AES-GCM',length:256}, true, ['encrypt','decrypt']);
+      const exported = await crypto.subtle.exportKey('raw', cryptoKey);
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(exported)));
+      localStorage.setItem(CRYPTO_KEY_STORE, b64);
+    }
+  } catch(e) { cryptoKey = null; }
+}
+
+async function encryptMsg(text) {
+  if(!cryptoKey || !text) return text;
+  try {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const enc = new TextEncoder().encode(text);
+    const ct = await crypto.subtle.encrypt({name:'AES-GCM',iv}, cryptoKey, enc);
+    const combined = new Uint8Array(iv.length + ct.byteLength);
+    combined.set(iv); combined.set(new Uint8Array(ct), iv.length);
+    return btoa(String.fromCharCode(...combined));
+  } catch(e) { return text; }
+}
+
+async function decryptMsg(cipher) {
+  if(!cryptoKey || !cipher) return cipher;
+  try {
+    const combined = Uint8Array.from(atob(cipher), c => c.charCodeAt(0));
+    const iv = combined.slice(0,12);
+    const ct = combined.slice(12);
+    const pt = await crypto.subtle.decrypt({name:'AES-GCM',iv}, cryptoKey, ct);
+    return new TextDecoder().decode(pt);
+  } catch(e) { return cipher; }
+}
+
+// ══ USER STORAGE ══
+function getUser(){ try{ return JSON.parse(localStorage.getItem(USER_KEY)); }catch{ return null; } }
+function saveUser(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); }
+function generateUID() { return Math.floor(1000 + Math.random() * 9000).toString(); }
+function getBlockedList(){ try{ return JSON.parse(localStorage.getItem(BLOCKED_KEY))||[]; }catch{ return []; } }
+function saveBlockedList(l){ localStorage.setItem(BLOCKED_KEY, JSON.stringify(l)); }
+function getMyContacts(){ try{ return JSON.parse(localStorage.getItem(MY_CONTACTS_KEY))||[]; }catch{ return []; } }
+function saveMyContacts(list){ localStorage.setItem(MY_CONTACTS_KEY, JSON.stringify(list)); }
+
+function findUserById(query) {
+  const cleanQuery = query.replace(/^@/, '').trim().toLowerCase();
+  if(!cleanQuery) return null;
+  return USER_DATABASE.find(u => {
+    const uid = u.uid.toLowerCase();
+    const username = u.uid.split('#')[0].toLowerCase();
+    return uid === cleanQuery || uid === '@' + cleanQuery || username === cleanQuery;
+  }) || null;
+}
+
+function isContactAdded(userId) {
+  const myContacts = getMyContacts();
+  const staticIds = CONTACTS.map(c => c.id);
+  return staticIds.includes(userId) || myContacts.some(c => c.id === userId);
+}
+
+function getSecurityAlerts(){ try{ return JSON.parse(localStorage.getItem(ALERTS_KEY))||[]; }catch{ return []; } }
+function saveSecurityAlerts(a){ localStorage.setItem(ALERTS_KEY, JSON.stringify(a.slice(-20))); }
+
+// ══ CHAT STORAGE ══
+function loadRawChats(){ try{ return JSON.parse(localStorage.getItem(CHATS_KEY))||{}; }catch{ return {}; } }
+function saveRawChats(d){ localStorage.setItem(CHATS_KEY, JSON.stringify(d)); }
+
+async function loadChats() {
+  const raw = loadRawChats();
+  const decrypted = {};
+  for(const cid of Object.keys(raw)) {
+    decrypted[cid] = await Promise.all((raw[cid]||[]).map(async m => {
+      const dm = {...m};
+      if(dm.encText) { dm.text = await decryptMsg(dm.encText); delete dm.encText; }
+      return dm;
+    }));
+  }
+  return decrypted;
+}
+
+async function saveMsg(cid, msg) {
+  const raw = loadRawChats();
+  if(!raw[cid]) raw[cid] = [];
+  const stored = {...msg};
+  if(stored.text) {
+    stored.encText = await encryptMsg(stored.text);
+    delete stored.text;
+  }
+  raw[cid].push(stored);
+  saveRawChats(raw);
+}
+
+async function initMessenger() {
+  // Ensure currentUser is always hydrated before messenger renders
+  if(!currentUser) currentUser = getUser();
+  const raw = loadRawChats();
+  if(!Object.keys(raw).length) {
+    for(const cid of Object.keys(SEED_MSGS)) {
+      for(const msg of SEED_MSGS[cid]) {
+        await saveMsg(cid, msg);
+      }
+    }
+  }
+  updateMyIdDisplay();
+  renderContactList();
+  updateAlertsCount();
+}
+
+// ══ CONVERSATION ID — FIX 5: sanitize Firebase path keys ══
+function getConversationId(uid1, uid2) {
+  // Normalize: strip special chars (#, @, spaces) so Firebase path is always valid
+  const clean = s => String(s || 'anon').replace(/[^a-zA-Z0-9_]/g, '_');
+  const sorted = [clean(uid1), clean(uid2)].sort();
+  return `chat_${sorted[0]}_${sorted[1]}`;
+}
+
+let activeListenersMap = {};
+
+function setupRealtimeListeners() {
+  if(!currentUser) currentUser = getUser();
+  if(!currentUser || !currentUser.uid) return;
+  const myUid = (currentUser.username || 'user') + (currentUser.uid || '0000');
+  const allContacts = [...CONTACTS, ...getMyContacts()];
+  allContacts.forEach(contact => {
+    const convoId = getConversationId(myUid, contact.id);
+    listenToConversation(convoId, contact.id);
+  });
+}
+
+function listenToConversation(convoId, contactId) {
+  if(activeListeners[convoId]) return;
+  const db = getFirebaseDb();
+  if(!db) return;
+}
+
+async function cacheConversationMessages(contactId, msgs) {
+  const raw = loadRawChats();
+  raw[contactId] = msgs.map(m => ({
+    from: m.from, text: m.text, time: m.timestamp,
+    status: m.status || 'delivered', sender: m.senderName || null,
+    image: m.image || null, voice: m.voice || null, firebaseKey: m.firebaseKey
+  }));
+  saveRawChats(raw);
+}
+
+// ══ MY ID ══
+function getMyFullId() {
+  const u = currentUser || getUser();
+  if(!u) return '@unknown#????';
+  const uid = u.uid && u.uid !== '0000' ? u.uid : '????';
+  return '@'+(u.username||'user')+'#'+uid;
+}
+
+function updateMyIdDisplay() {
+  const el = document.getElementById('my-id-display');
+  if(el) el.textContent = getMyFullId();
+}
+
+function copyMyId() {
+  const id = getMyFullId();
+  navigator.clipboard?.writeText(id).then(() => notif('success','Copied',id+' copied to clipboard')).catch(() => {
+    const ta = document.createElement('textarea'); ta.value=id; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    notif('success','Copied',id+' copied to clipboard');
+  });
+}
+
+// ══ CHECK USER & LOGIN FLOW ══
+function checkUser() {
+  const u = getUser();
+  if(!u){ goPage('faceid'); return; }
+  // Always sync currentUser on startup
+  currentUser = u;
+  if(u.faceDescriptor){ goPage('faceid'); }
+  else {
+    const sk = document.getElementById('sk-welcome');
+    if(sk) sk.textContent = `Welcome back, ${u.name.split(' ')[0]}. Enter your 6-digit key.`;
+    goPage('safekey');
+  }
+}
+
+// ══ FIX 1: doLogin — always re-hydrate currentUser, guard against null ══
+function doLogin() {
+  migrateUserIfNeeded(); // heal uid before reading
+  currentUser = getUser();
+  if(!currentUser) { goPage('faceid'); return; }   // ← FIX 1: guard null user
+  stopFidCamera();
+  populateProfiles();
+  goPage('profiles');
+  initMessenger();
+  notif('success','Access Granted',`Welcome back, ${currentUser.name.split(' ')[0]} 👋`);
+}
+
+function populateProfiles() {
+  const u = currentUser || getUser();
+  if(!u) return;
+  // Keep currentUser in sync
+  if(!currentUser) currentUser = u;
+  const init = (u.name||'?')[0].toUpperCase();
+  ['prof-av','sett-av'].forEach(id => { const el=document.getElementById(id); if(el)el.textContent=init; });
+  const fullId = getMyFullId();
+  const pn=document.getElementById('prof-name'); if(pn)pn.textContent=u.name;
+  const pu=document.getElementById('prof-uid');  if(pu)pu.textContent=fullId;
+  const su=document.getElementById('sett-uname'); if(su)su.textContent=u.name;
+  const suid=document.getElementById('sett-uid'); if(suid)suid.textContent='@'+(u.username||'user');
+  const snid=document.getElementById('sett-nexus-id'); if(snid)snid.textContent=fullId;
+  const sj=document.getElementById('sett-joined'); if(sj)sj.textContent='Member since '+new Date(u.createdAt||Date.now()).toLocaleDateString();
+  const sf=document.getElementById('sett-face-status'); if(sf)sf.textContent=u.faceDescriptor?'Enrolled ✓':'Not enrolled';
+  const sa=document.getElementById('sett-api-status'); if(sa)sa.textContent=getApiKey()?'Configured ✓':'Not configured';
+  const fb=document.getElementById('sett-firebase-status'); if(fb)fb.textContent=getFirebaseConfig()?'Configured ✓':'Not configured — required for real messaging';
+  updateSnapshotCount();
+}
+
+function lockApp() {
+  if(currentUtterance) window.speechSynthesis.cancel();
+  stopFidCamera(); stopChatFidCamera();
+  currentContact = null;
+  currentUser = null;   // clear in-memory state on lock
+  goPage('faceid');
+}
+
+function resetAccount() {
+  if(confirm('Reset will permanently erase all data. Continue?')) { localStorage.clear(); location.reload(); }
+}
+
+// ══ FIX 4: goPage — always re-hydrate currentUser on navigation ══
+function goPage(p) {
+  // Always keep currentUser in sync with localStorage so sendMsg never fails
+  if(!currentUser) currentUser = getUser();
+  document.querySelectorAll('.page').forEach(el => el.classList.add('out'));
+  const t = document.getElementById('page-'+p);
+  if(t) setTimeout(() => t.classList.remove('out'), 20);
+  if(p==='settings') populateProfiles();
+  if(p==='ai'){ loadRobotPrefs(); setTimeout(startBlinking,1500); }
+  if(p==='msg') initMessenger();
+}
+
+function openMessenger() { goPage('msg'); }
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent = isDark?'🌙':'☀️';
+  const ti=document.getElementById('sett-theme-ico'); if(ti)ti.textContent=isDark?'🌙':'☀️';
+  const tl=document.getElementById('sett-theme-lbl'); if(tl)tl.textContent=isDark?'Dark mode':'Light mode';
+  const tt=document.getElementById('sett-theme-toggle'); if(tt)tt.classList.toggle('on',isDark);
+}
+
+// ══ NOTIF ══
+function notif(type, title, body) {
+  const icons={success:'✅',danger:'❌',warning:'⚠️',info:'ℹ️'};
+  const s=document.getElementById('notif-stack');
+  const n=document.createElement('div'); n.className='notif '+type;
+  const ico=document.createElement('div'); ico.className='n-ico'; ico.textContent=icons[type]||'ℹ️';
+  const txt=document.createElement('div');
+  txt.innerHTML=`<div class="n-title">${title}</div><div class="n-body">${body}</div>`;
+  n.appendChild(ico); n.appendChild(txt); s.appendChild(n);
+  setTimeout(()=>{ n.style.cssText+='opacity:0;transform:translateX(24px);transition:all .4s'; setTimeout(()=>n.remove(),420); },4200);
+}
+
+// ══ FACE MODELS ══
+async function loadFaceModels() {
+  if(faceModelsLoaded) return;
+  if(!faceapi) {
+    const m = await import('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.esm.js');
+    faceapi = m; window.faceapi = m;
+  }
+  const U = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
+  await Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri(U),
+    faceapi.nets.faceLandmark68Net.loadFromUri(U),
+    faceapi.nets.faceRecognitionNet.loadFromUri(U)
+  ]);
+  faceModelsLoaded = true;
+}
+
+function euclidDist(a,b){ let s=0; for(let i=0;i<a.length;i++)s+=(a[i]-b[i])**2; return Math.sqrt(s); }
+
+async function captureMultipleDescriptors(videoEl, count=5) {
+  const descriptors=[];
+  const opts=new faceapi.TinyFaceDetectorOptions({scoreThreshold:.5,inputSize:416});
+  for(let a=0;a<40&&descriptors.length<count;a++){
+    try{
+      const det=await faceapi.detectSingleFace(videoEl,opts).withFaceLandmarks().withFaceDescriptor();
+      if(det&&det.descriptor) descriptors.push(Array.from(det.descriptor));
+    }catch(e){}
+    await new Promise(r=>setTimeout(r,180));
+  }
+  return descriptors;
+}
+
+function averageDescriptor(descs) {
+  if(!descs.length) return null;
+  const len=descs[0].length, avg=new Float32Array(len);
+  for(const d of descs) for(let i=0;i<len;i++) avg[i]+=d[i];
+  for(let i=0;i<len;i++) avg[i]/=descs.length;
+  return avg;
+}
+
+// ══ LOGIN FACE ID ══
+function setFidStatus(msg,cls=''){
+  const el=document.getElementById('fid-status');
+  if(el){el.textContent=msg;el.className='fid-status'+(cls?' '+cls:'');}
+}
+function setFidErr(msg){const el=document.getElementById('fid-err');if(el)el.textContent=msg;}
+function updateConfidence(pct){
+  const meter=document.getElementById('conf-meter'),fill=document.getElementById('conf-fill');
+  if(!meter||!fill)return;
+  meter.classList.add('on'); fill.style.width=Math.min(100,Math.max(0,pct))+'%';
+}
+
+async function startFaceID() {
+  const btn=document.getElementById('fid-btn'); btn.disabled=true;
+  setFidErr(''); setFidStatus('Loading face recognition models…');
+  try {
+    await loadFaceModels(); setFidStatus('Starting camera…');
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}});
+    fidStream=stream;
+    const video=document.getElementById('fid-video');
+    video.srcObject=stream;
+    await new Promise(r=>{video.onloadeddata=r;});
+    document.getElementById('cam-idle').style.display='none';
+    document.getElementById('cam-video-wrap').style.display='block';
+    document.getElementById('cam-spinner').style.display='block';
+    document.getElementById('cam-scan').style.display='block';
+    document.getElementById('cam-mesh').classList.add('on');
+    const user=getUser();
+    if(!user){setFidStatus('No account found','error');btn.disabled=false;return;}
+    if(!user.faceDescriptor){
+      setFidStatus('No face enrolled — use password','warn');
+      stopFidCamera();
+      const sk=document.getElementById('sk-welcome');
+      if(sk)sk.textContent=`Welcome back, ${user.name.split(' ')[0]}. Enter your 6-digit key.`;
+      goPage('safekey'); return;
+    }
+    setFidStatus('Scanning… look at the camera','scanning');
+    const enrolledDesc=new Float32Array(user.faceDescriptor);
+    const recentDists=[];
+    const opts=new faceapi.TinyFaceDetectorOptions({scoreThreshold:.45,inputSize:416});
+    let scanAttempts=0;
+    const scan=async()=>{
+      if(scanAttempts>=50){
+        stopFidCamera();btn.disabled=false;
+        captureAndSaveIntruder('Login face scan timeout');
+        setFidStatus('Could not verify — try password','warn');
+        return;
+      }
+      scanAttempts++;
+      try{
+        const det=await faceapi.detectSingleFace(video,opts).withFaceLandmarks().withFaceDescriptor();
+        if(det&&det.descriptor){
+          const dist=euclidDist(det.descriptor,enrolledDesc);
+          recentDists.push(dist); if(recentDists.length>5)recentDists.shift();
+          const conf=Math.max(0,Math.min(100,(1-(dist-0.35)/0.4)*100));
+          updateConfidence(conf);
+          const avgDist=recentDists.reduce((a,b)=>a+b,0)/recentDists.length;
+          if(recentDists.length>=3&&avgDist<0.6){
+            setFidStatus('✓ Identity confirmed','success'); updateConfidence(100);
+            document.getElementById('cam-spinner').style.display='none';
+            stopFidCamera(); setTimeout(doLogin,700); return;
+          } else if(avgDist>0.65) {
+            stopFidCamera(); btn.disabled=false;
+            captureAndSaveIntruder('Unauthorized Access');
+            setFidStatus('Verification failed — use password','warn');
+            return;
+          }
+          else setFidStatus(`Analyzing… (${recentDists.length}/3 samples)`,'scanning');
+        } else { setFidStatus('No face detected — center your face','scanning'); updateConfidence(0); }
+      }catch(e){}
+      setTimeout(scan,200);
+    };
+    scan();
+  }catch(err){
+    console.error('FaceID error:',err);
+    if(err.name==='NotAllowedError'){setFidStatus('Camera access denied','error');setFidErr('Please allow camera access and refresh');}
+    else{setFidStatus('Camera error — use password','error');}
+    btn.disabled=false; stopFidCamera();
+  }
+}
+
+function stopFidCamera(){
+  if(fidStream){fidStream.getTracks().forEach(t=>t.stop());fidStream=null;}
+  const v=document.getElementById('fid-video');if(v)v.srcObject=null;
+  document.getElementById('cam-idle').style.display='flex';
+  document.getElementById('cam-video-wrap').style.display='none';
+  document.getElementById('cam-spinner').style.display='none';
+  document.getElementById('cam-scan').style.display='none';
+  document.getElementById('cam-mesh').classList.remove('on');
+  document.getElementById('conf-meter').classList.remove('on');
+  const btn=document.getElementById('fid-btn');if(btn)btn.disabled=false;
+}
+
+function goToSafeKey(){
+  stopFidCamera();
+  const user=getUser();
+  const sk=document.getElementById('sk-welcome');
+  if(sk&&user)sk.textContent=`Welcome back, ${user.name.split(' ')[0]}. Enter your 6-digit key.`;
+  goPage('safekey');
+}
+
+// ══ SAFE KEY ══
+function skAutoSubmit(){if(document.getElementById('sk-input').value.length===6)setTimeout(verifyKey,80);}
+function verifyKey(){
+  const user=getUser();if(!user){goRegister();return;}
+  const key=document.getElementById('sk-input').value;
+  const err=document.getElementById('sk-error');
+  if(key.length<6){err.textContent='Enter all 6 digits';return;}
+  if(key!==user.key){
+    err.textContent='Wrong key — access denied';
+    captureAndSaveIntruder('Wrong safe key entered');
+    document.getElementById('sk-input').value='';
+    return;
+  }
+  err.textContent=''; document.getElementById('sk-input').value=''; doLogin();
+}
+
+// ══ INTRUDER CAPTURE ══
+async function captureAndSaveIntruder(reason) {
+  let photoData = null;
+  try {
+    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:320,height:240}});
+    const v=document.createElement('video');v.srcObject=s;v.muted=true;v.playsInline=true;
+    await v.play(); await new Promise(r=>setTimeout(r,800));
+    const c=document.createElement('canvas');c.width=320;c.height=240;
+    c.getContext('2d').drawImage(v,0,0); s.getTracks().forEach(t=>t.stop());
+    photoData=c.toDataURL('image/jpeg',.7);
+  }catch(e){}
+  const alerts=getSecurityAlerts();
+  const label = reason.includes('face') || reason.includes('Face') ? 'Unauthorized Access' : reason;
+  alerts.push({time:Date.now(), reason: label, photo:photoData});
+  saveSecurityAlerts(alerts);
+  updateAlertsCount();
+}
+
+function updateAlertsCount(){
+  const alerts=getSecurityAlerts();
+  const cnt=document.getElementById('alerts-count');
+  if(cnt){
+    if(alerts.length>0){cnt.textContent=alerts.length;cnt.style.display='inline';}
+    else{cnt.style.display='none';}
+  }
+}
+
+// ══ SECURITY ALERTS MODAL ══
+function openAlertsModal(){
+  const modal=document.getElementById('alerts-modal'); modal.classList.remove('hidden');
+  const body=document.getElementById('alerts-body'); body.innerHTML='';
+  const alerts=getSecurityAlerts();
+  if(!alerts.length){body.innerHTML='<div class="no-alerts">No security snapshots recorded</div>';return;}
+  [...alerts].reverse().forEach((a)=>{
+    const item=document.createElement('div'); item.className='alert-item';
+    const photo=document.createElement('div');
+    if(a.photo){
+      const img=document.createElement('img');
+      img.className='alert-photo'; img.src=a.photo;
+      photo.appendChild(img);
+    } else {
+      photo.className='alert-photo-placeholder';
+      photo.textContent='📷';
+    }
+    const info=document.createElement('div'); info.className='alert-info';
+    const reason=document.createElement('div'); reason.className='alert-reason'; reason.textContent=a.reason||'Unauthorized access attempt';
+    const time=document.createElement('div'); time.className='alert-time'; time.textContent=new Date(a.time).toLocaleString();
+    info.appendChild(reason); info.appendChild(time);
+    item.appendChild(photo); item.appendChild(info);
+    body.appendChild(item);
+  });
+}
+function closeAlertsModal(){document.getElementById('alerts-modal').classList.add('hidden'); updateSnapshotCount();}
+
+// ══ REGISTRATION ══
+function goRegister(){ regStep=0; regData={}; showRegStep(0); goPage('register'); }
+let regStep=0, regData={};
+
+function showRegStep(n){
+  document.querySelectorAll('.rs').forEach((el,i)=>el.classList.toggle('active',i===n));
+  document.querySelectorAll('.rp-step').forEach((el,i)=>{
+    el.classList.toggle('done',i<n); el.classList.toggle('active',i===n);
+  });
+  regStep=n;
+  if(n===2) feState='idle';
+}
+
+function regNext(){
+  if(regStep===0){
+    const nm=document.getElementById('r-name').value.trim(), us=document.getElementById('r-user').value.trim();
+    if(!nm){document.getElementById('re-0').textContent='Enter your name';return;}
+    if(us.length<2){document.getElementById('re-0').textContent='Username too short';return;}
+    regData.name=nm; regData.username=us.replace('@','').replace(/#\d+$/,'');
+    regData.uid=generateUID();
+    document.getElementById('re-0').textContent=''; showRegStep(1);
+  } else if(regStep===1){
+    const k1=document.getElementById('r-key').value, k2=document.getElementById('r-key2').value;
+    if(k1.length!==6||!/^\d+$/.test(k1)){document.getElementById('re-1').textContent='Key must be 6 digits';return;}
+    if(k1!==k2){document.getElementById('re-1').textContent='Keys do not match';return;}
+    regData.key=k1; document.getElementById('re-1').textContent=''; showRegStep(2);
+  }
+}
+
+async function feAction(){
+  const btn=document.getElementById('fe-btn');
+  if(feState==='idle'){
+    feState='started'; btn.textContent='⏳ Loading models…'; btn.disabled=true;
+    try{
+      await loadFaceModels();
+      const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480}});
+      faceEnrollStream=s;
+      const v=document.getElementById('fe-video');
+      v.srcObject=s; await new Promise(r=>{v.onloadeddata=r;});
+      document.getElementById('reg-spin').style.display='block';
+      document.getElementById('fe-status').textContent='CENTER YOUR FACE AND CLICK CAPTURE';
+      btn.textContent='📸 Capture Face'; btn.disabled=false; feState='ready';
+    }catch(e){
+      document.getElementById('fe-status').textContent='CAMERA UNAVAILABLE';
+      btn.textContent='📷 Retry'; btn.disabled=false; feState='idle';
+    }
+  } else if(feState==='ready'){
+    feState='capturing'; btn.textContent='⏳ Scanning…'; btn.disabled=true;
+    document.getElementById('fe-status').textContent='HOLD STILL — CAPTURING MULTIPLE SAMPLES…';
+    try{
+      const v=document.getElementById('fe-video');
+      const descs=await captureMultipleDescriptors(v,5);
+      if(!descs.length) throw new Error('No face');
+      const avg=averageDescriptor(descs);
+      faceEnrollStream?.getTracks().forEach(t=>t.stop()); faceEnrollStream=null;
+      document.getElementById('reg-spin').style.display='none';
+      feState='done';
+      document.getElementById('fe-status').innerHTML='<span style="color:var(--green)">✓ FACE ENROLLED ('+descs.length+' SAMPLES)</span>';
+      btn.textContent='→ Continue'; btn.disabled=false;
+      regData.faceDescriptor=Array.from(avg);
+    }catch(e){
+      document.getElementById('fe-status').textContent='NO FACE DETECTED — TRY AGAIN';
+      btn.textContent='📸 Try Again'; btn.disabled=false; feState='ready';
+    }
+  } else if(feState==='done'){ showRegStep(3); }
+}
+
+function skipFace(){ faceEnrollStream?.getTracks().forEach(t=>t.stop()); faceEnrollStream=null; regData.faceDescriptor=null; showRegStep(3); }
+
+function regComplete(){
+  const userData = {
+    name: regData.name,
+    username: regData.username,
+    uid: regData.uid || generateUID(),   // guarantee uid is always set
+    key: regData.key,
+    faceDescriptor: regData.faceDescriptor || null,
+    createdAt: Date.now()
+  };
+  saveUser(userData);
+  currentUser = userData;   // set immediately so sendMsg never sees null
+  doLogin();
+}
+
+// ══ TABS ══
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.cp-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  const searchBar=document.getElementById('cp-search-bar');
+  const addBar=document.getElementById('contact-add-bar');
+  searchBar.style.display=tab==='contacts'?'none':'block';
+  addBar.classList.toggle('hidden',tab!=='contacts');
+  renderContactList();
+}
+
+// ══ CONTACT / CHAT LIST ══
+async function renderContactList(filter='') {
+  const list=document.getElementById('clist'); if(!list)return;
+  list.innerHTML='';
+  const blocked=getBlockedList();
+
+  if(currentTab==='blocked'){
+    const bContacts=CONTACTS.filter(c=>blocked.includes(c.id));
+    if(!bContacts.length){
+      list.innerHTML='<div style="padding:20px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text-f);letter-spacing:.1em;text-transform:uppercase;">No blocked contacts</div>';
+      return;
+    }
+    bContacts.forEach(c=>{
+      const item=document.createElement('div'); item.className='blocked-item';
+      const av=document.createElement('div'); av.className='blocked-av'; av.style.background=c.color; av.textContent=c.emoji;
+      const nm=document.createElement('div'); nm.className='blocked-name'; nm.textContent=c.name;
+      const ub=document.createElement('button'); ub.className='unblock-btn'; ub.textContent='Unblock';
+      ub.onclick=()=>{ const bl=getBlockedList(); saveBlockedList(bl.filter(id=>id!==c.id)); renderContactList(); notif('success','Unblocked',c.name+' can message you again'); };
+      item.appendChild(av); item.appendChild(nm); item.appendChild(ub); list.appendChild(item);
+    });
+    return;
+  }
+
+  if(currentTab==='contacts'){
+    const myContacts=getMyContacts();
+    const allContacts=[...CONTACTS,...myContacts];
+    const addedIds=allContacts.map(c=>c.id);
+    const dbUsers=USER_DATABASE.filter(u=>!addedIds.includes(u.id)&&(!filter||u.name.toLowerCase().includes(filter.toLowerCase())||u.uid.toLowerCase().includes(filter.toLowerCase())));
+    const displayContacts=allContacts.filter(c=>!filter||c.name.toLowerCase().includes(filter.toLowerCase())||c.uid.toLowerCase().includes(filter.toLowerCase()));
+
+    if(displayContacts.length){
+      const hdr=document.createElement('div');
+      hdr.style.cssText='padding:8px 14px;font-family:var(--mono);font-size:9px;color:var(--text-f);letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid var(--bsoft);';
+      hdr.textContent='My Contacts ('+displayContacts.length+')';
+      list.appendChild(hdr);
+    }
+    displayContacts.forEach(c=>{
+      const el=document.createElement('div'); el.className='ci'; el.onclick=()=>openChatRequest(c);
+      const av=document.createElement('div'); av.className='ci-av'; av.style.background=c.color; av.textContent=c.emoji;
+      const info=document.createElement('div'); info.className='ci-info';
+      const nm=document.createElement('div'); nm.className='ci-name'; nm.textContent=c.name;
+      const uid=document.createElement('div'); uid.className='ci-uid'; uid.textContent=c.uid;
+      const role=document.createElement('div'); role.className='ci-prev'; role.textContent=c.role+(isContactAdded(c.id)?' · Added':'');
+      info.appendChild(nm); info.appendChild(uid); info.appendChild(role);
+      el.appendChild(av); el.appendChild(info); list.appendChild(el);
+    });
+
+    if(dbUsers.length){
+      const dhdr=document.createElement('div');
+      dhdr.style.cssText='padding:8px 14px;font-family:var(--mono);font-size:9px;color:var(--goldd);letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid var(--bsoft);border-top:1px solid var(--border);margin-top:4px;';
+      dhdr.textContent='Discover People';
+      list.appendChild(dhdr);
+      dbUsers.forEach(c=>{
+        const el=document.createElement('div'); el.className='ci'; el.style.opacity='.7';
+        const av=document.createElement('div'); av.className='ci-av'; av.style.background=c.color; av.textContent=c.emoji;
+        const info=document.createElement('div'); info.className='ci-info';
+        const nm=document.createElement('div'); nm.className='ci-name'; nm.textContent=c.name;
+        const uid=document.createElement('div'); uid.className='ci-uid'; uid.textContent=c.uid;
+        const role=document.createElement('div'); role.className='ci-prev'; role.textContent=c.role+' · Tap to add';
+        info.appendChild(nm); info.appendChild(uid); info.appendChild(role);
+        el.appendChild(av); el.appendChild(info);
+        el.onclick=()=>{ document.getElementById('contact-search-inp').value=c.uid; addContact(); };
+        list.appendChild(el);
+      });
+    }
+    return;
+  }
+
+  const chats=loadRawChats();
+  const myContacts=getMyContacts();
+  const allContacts=[...CONTACTS,...myContacts];
+  const visibleContacts=allContacts.filter(c=>!blocked.includes(c.id)&&(!filter||c.name.toLowerCase().includes(filter.toLowerCase())||c.uid.toLowerCase().includes(filter.toLowerCase())));
+  visibleContacts.forEach(c=>{
+    const msgs=chats[c.id]||[];
+    const last=msgs[msgs.length-1];
+    const el=document.createElement('div');
+    el.className='ci'+(currentContact?.id===c.id?' active':'');
+    el.onclick=()=>openChatRequest(c);
+    const av=document.createElement('div'); av.className='ci-av ci-av-'+(c.status==='online'?'online':c.status==='away'?'away':''); av.style.background=c.color; av.textContent=c.emoji;
+    const info=document.createElement('div'); info.className='ci-info';
+    const row1=document.createElement('div'); row1.className='ci-row1';
+    const nm=document.createElement('div'); nm.className='ci-name'; nm.textContent=c.name;
+    const tm=document.createElement('div'); tm.className='ci-time'; tm.textContent=last?fmtTime(last.time):'';
+    row1.appendChild(nm); row1.appendChild(tm);
+    const row2=document.createElement('div'); row2.className='ci-row2';
+    const pv=document.createElement('div'); pv.className='ci-prev'; pv.textContent='🔒 Encrypted';
+    row2.appendChild(pv);
+    if(c.unread>0){const b=document.createElement('span');b.className='ci-un';b.textContent=c.unread;row2.appendChild(b);}
+    info.appendChild(row1); info.appendChild(row2); el.appendChild(av); el.appendChild(info); list.appendChild(el);
+  });
+}
+
+function filterContacts(v){ renderContactList(v); }
+
+// ══ ADD CONTACT ══
+function addContact(){
+  const inp=document.getElementById('contact-search-inp');
+  const q=inp.value.trim();
+  if(!q){ notif('warning','Enter ID','Type a username#ID to search'); return; }
+  const cleanQuery = q.replace(/^@/, '').trim();
+  const match = findUserById(cleanQuery);
+  if(match){
+    if(isContactAdded(match.id)){
+      notif('info','Already Added',match.name+' is already in your contacts');
+      inp.value='';
+      switchTab('chats');
+      openChatRequest(match);
+      return;
+    }
+    const myContacts = getMyContacts();
+    myContacts.push(match);
+    saveMyContacts(myContacts);
+    notif('success','Contact Added',match.name+' ('+match.uid+') added to your contacts');
+    inp.value='';
+    switchTab('chats');
+    openChatRequest(match);
+  } else {
+    notif('warning','User Not Found','No user with ID "'+cleanQuery+'" exists');
+  }
+}
+
+// ══ CHAT FACE ID GATE ══
+function openChatRequest(contact) {
+  currentContact = contact;
+  const idx=CONTACTS.findIndex(c=>c.id===contact.id);if(idx>=0)CONTACTS[idx].unread=0;
+  renderContactList();
+  document.getElementById('no-chat-state').classList.add('hidden');
+  const ca=document.getElementById('chat-active'); ca.classList.remove('hidden'); ca.style.display='flex';
+  document.getElementById('chat-content-wrap').classList.add('hidden');
+  document.getElementById('ghost-overlay').classList.add('hidden');
+  document.getElementById('chat-fid-gate').style.display='flex';
+  document.getElementById('chat-fid-status').textContent='Tap to scan';
+  document.getElementById('chat-fid-status').className='chat-fid-status';
+  document.getElementById('chat-fid-btn').textContent='🔓 Scan Face';
+  document.getElementById('chat-fid-btn').disabled=false;
+  document.getElementById('chat-fid-spinner').style.display='none';
+  document.getElementById('chat-fid-idle').style.display='flex';
+  stopChatFidCamera();
+  if(cameraAvailable===false){
+    document.getElementById('chat-fid-status').textContent='Camera unavailable (HTTPS required)';
+    document.getElementById('chat-fid-status').className='chat-fid-status warn';
+  }
+}
+
+async function startChatFaceID(){
+  const btn=document.getElementById('chat-fid-btn');
+  const status=document.getElementById('chat-fid-status');
+  if(chatFidScanActive) return;
+  chatFidScanActive=true; btn.disabled=true;
+  status.textContent='Loading models…'; status.className='chat-fid-status scanning';
+  try{
+    await loadFaceModels();
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480}});
+    chatFidStream=stream;
+    const video=document.getElementById('chat-fid-video');
+    video.srcObject=stream;
+    await new Promise(r=>{video.onloadeddata=r;});
+    document.getElementById('chat-fid-idle').style.display='none';
+    document.getElementById('chat-fid-spinner').style.display='block';
+    status.textContent='Scanning…'; status.className='chat-fid-status scanning';
+    const user=getUser();
+    if(!user?.faceDescriptor){
+      stopChatFidCamera(); chatFidScanActive=false;
+      openChatContent(); return;
+    }
+    const enrolledDesc=new Float32Array(user.faceDescriptor);
+    const recentDists=[];
+    const opts=new faceapi.TinyFaceDetectorOptions({scoreThreshold:.45,inputSize:416});
+    let attempts=0;
+    const scan=async()=>{
+      if(attempts>=40){
+        stopChatFidCamera(); chatFidScanActive=false; btn.disabled=false;
+        await activateGhostMode('Unauthorized Access');
+        return;
+      }
+      attempts++;
+      try{
+        const det=await faceapi.detectSingleFace(video,opts).withFaceLandmarks().withFaceDescriptor();
+        if(det&&det.descriptor){
+          const dist=euclidDist(det.descriptor,enrolledDesc);
+          recentDists.push(dist);if(recentDists.length>4)recentDists.shift();
+          const avg=recentDists.reduce((a,b)=>a+b,0)/recentDists.length;
+          if(recentDists.length>=3){
+            if(avg<0.6){
+              status.textContent='✓ Verified'; status.className='chat-fid-status success';
+              stopChatFidCamera(); chatFidScanActive=false;
+              setTimeout(openChatContent,500); return;
+            } else if(avg>0.65){
+              stopChatFidCamera(); chatFidScanActive=false; btn.disabled=false;
+              await activateGhostMode('Unauthorized Access');
+              return;
+            }
+          }
+          status.textContent=`Analyzing… (${recentDists.length}/3)`; status.className='chat-fid-status scanning';
+        } else {
+          status.textContent='No face — center yourself'; status.className='chat-fid-status scanning';
+        }
+      }catch(e){}
+      setTimeout(scan,200);
+    };
+    scan();
+  }catch(err){
+    chatFidScanActive=false; btn.disabled=false;
+    if(err.name==='NotAllowedError'){
+      status.textContent='Camera denied — opening directly'; status.className='chat-fid-status warn';
+      setTimeout(openChatContent,1000);
+    } else {
+      status.textContent='Error — opening directly'; status.className='chat-fid-status warn';
+      setTimeout(openChatContent,1000);
+    }
+    stopChatFidCamera();
+  }
+}
+
+function stopChatFidCamera(){
+  if(chatFidStream){chatFidStream.getTracks().forEach(t=>t.stop());chatFidStream=null;}
+  const v=document.getElementById('chat-fid-video');if(v)v.srcObject=null;
+  document.getElementById('chat-fid-idle').style.display='flex';
+  document.getElementById('chat-fid-spinner').style.display='none';
+}
+
+function skipChatFaceID(){ stopChatFidCamera(); chatFidScanActive=false; openChatContent(); }
+
+async function activateGhostMode(reason){
+  await captureAndSaveIntruder(reason);
+  document.getElementById('chat-fid-gate').style.display='none';
+  document.getElementById('chat-content-wrap').classList.add('hidden');
+  document.getElementById('ghost-overlay').classList.remove('hidden');
+}
+
+async function verifyGhostOwner(){
+  document.getElementById('ghost-overlay').classList.add('hidden');
+  document.getElementById('chat-fid-gate').style.display='flex';
+  document.getElementById('chat-fid-status').textContent='Tap to verify ownership';
+  document.getElementById('chat-fid-status').className='chat-fid-status';
+  document.getElementById('chat-fid-btn').textContent='🔓 Verify & Restore';
+  document.getElementById('chat-fid-btn').disabled=false;
+  document.getElementById('chat-fid-spinner').style.display='none';
+  document.getElementById('chat-fid-idle').style.display='flex';
+}
+
+async function openChatContent(){
+  document.getElementById('chat-fid-gate').style.display='none';
+  document.getElementById('ghost-overlay').classList.add('hidden');
+  const cw=document.getElementById('chat-content-wrap');
+  cw.classList.remove('hidden'); cw.style.display='flex';
+  const c=currentContact;
+  const av=document.getElementById('cz-av'); av.style.background=c.color; av.textContent=c.emoji;
+  av.className='cc-av'+(c.status==='online'?' cc-online':'');
+  document.getElementById('cz-name').textContent=c.name;
+  document.getElementById('cz-status').textContent=c.status==='online'?'online · last seen now':c.status==='away'?'last seen recently':'last seen a while ago';
+  document.getElementById('cz-uid').textContent=c.uid;
+  await renderMessages();
+}
+
+// ══ MESSAGES ══
+async function renderMessages(){
+  if(!currentContact) return;
+  await renderMessagesFromCache(currentContact.id);
+}
+
+async function renderMessagesFromCache(contactId){
+  const body=document.getElementById('msg-body'); if(!body)return;
+  body.innerHTML='';
+  const chats=await loadChats();
+  const msgs=chats[contactId]||[];
+  let lastDate='';
+  for(const msg of msgs){
+    const md=fmtDate(msg.time);
+    if(md!==lastDate){
+      const div=document.createElement('div'); div.className='date-divider';
+      const sp=document.createElement('span'); sp.textContent=md; div.appendChild(sp); body.appendChild(div);
+      lastDate=md;
+    }
+    const user = currentUser || getUser();
+    const isMe=msg.from==='me'||msg.from===user?.uid||(user&&msg.from===(user.username||'')+(user.uid||''));
+    const row=document.createElement('div'); row.className='msg-row '+(isMe?'sent':'recv');
+    const bubble=document.createElement('div'); bubble.className='bubble';
+    if(!isMe&&msg.senderName){
+      const sl=document.createElement('div');
+      sl.style.cssText='font-family:var(--mono);font-size:9.5px;color:var(--gold);margin-bottom:4px;font-weight:600;';
+      sl.textContent=msg.senderName; bubble.appendChild(sl);
+    }
+    if(msg.image){const img=document.createElement('img');img.className='bubble-img';img.src=msg.image;img.onclick=()=>window.open(msg.image,'_blank');bubble.appendChild(img);}
+    if(msg.voice){bubble.appendChild(buildVoiceNoteBubble(msg.voice));}
+    if(msg.text){const t=document.createElement('div');t.className='bubble-text';t.textContent=msg.text;bubble.appendChild(t);}
+    const meta=document.createElement('div'); meta.className='msg-meta';
+    const lock=document.createElement('span'); lock.className='msg-lock'; lock.textContent='🔒';
+    const tm=document.createElement('span'); tm.className='msg-time'; tm.textContent=fmtChatTime(msg.time);
+    meta.appendChild(lock); meta.appendChild(tm);
+    if(isMe){const tk=document.createElement('span');tk.className='msg-ticks '+(msg.status||'sent');tk.textContent=msg.status==='read'?'✓✓':msg.status==='delivered'?'✓✓':'✓';meta.appendChild(tk);}
+    bubble.appendChild(meta); row.appendChild(bubble); body.appendChild(row);
+  }
+  body.scrollTop=body.scrollHeight;
+}
+
+function buildVoiceNoteBubble(dur){
+  const vn=document.createElement('div');vn.className='voice-note';
+  const btn=document.createElement('button');btn.className='vn-play';btn.textContent='▶';
+  const wave=document.createElement('div');wave.className='vn-wave';
+  for(let i=0;i<18;i++){const b=document.createElement('div');b.className='vn-bar';b.style.height=(4+Math.random()*18)+'px';wave.appendChild(b);}
+  const d=document.createElement('span');d.className='vn-dur';d.textContent=dur||'0:12';
+  vn.appendChild(btn);vn.appendChild(wave);vn.appendChild(d);return vn;
+}
+
+// ══ FIX 2 + FIX 3: sendMsg — correct auth check + stable myUid ══
+async function sendMsg(){
+  const ta=document.getElementById('msg-ta');if(!ta||!currentContact)return;
+  const text=ta.value.trim();
+  const chips=document.getElementById('msg-chips');
+  if(!text&&(!chips||!chips.children.length))return;
+
+  // Always get the freshest user — never block if localStorage has a valid user
+  const user = currentUser || getUser();
+  if(!user) { notif('warning','Not Logged In','Please log in to send messages'); return; }
+  currentUser = user; // always keep in sync
+
+  // Ensure uid is valid — self-heal inline if needed
+  if(!user.uid || user.uid === '0000') {
+    user.uid = generateUID();
+    saveUser(user);
+    currentUser = user;
+  }
+
+  // Build a stable sender key with only safe chars
+  const myUid = (user.username || 'user') + '_' + (user.uid || generateUID());
+  const contactId = currentContact.id;
+  const convoId = getConversationId(myUid, contactId);
+  const db = getFirebaseDb();
+
+  if(db){
+    if(text){
+      const msgData = {
+        from: myUid,
+        to: contactId,
+        text: text,
+        timestamp: Date.now(),
+        status: 'sent',
+        senderName: user.name || 'Me'
+      };
+      try {
+        // push() is loaded from Firebase if available
+        await pushToFirebase(`messages/${convoId}`, msgData);
+      } catch(e) {
+        await saveMsg(contactId, {from:'me', text, time:Date.now(), status:'sent'});
+      }
+      ta.value='';ta.style.height='auto';
+    }
+    for(const chip of document.querySelectorAll('#msg-chips .chip')){
+      if(chip.dataset.img){
+        const imgData = {
+          from: myUid, to: contactId, image: chip.dataset.img, text: '',
+          timestamp: Date.now(), status: 'sent', senderName: user.name || 'Me'
+        };
+        try { await pushToFirebase(`messages/${convoId}`, imgData); } catch(e) {
+          await saveMsg(contactId, {from:'me', image:chip.dataset.img, text:'', time:Date.now(), status:'sent'});
+        }
+      }
+      chip.remove();
+    }
+  } else {
+    // Offline mode: save locally
+    if(text){
+      await saveMsg(contactId, {from:'me', text, time:Date.now(), status:'sent'});
+      ta.value='';ta.style.height='auto';
+    }
+    for(const chip of document.querySelectorAll('#msg-chips .chip')){
+      if(chip.dataset.img){
+        await saveMsg(contactId, {from:'me', image:chip.dataset.img, text:'', time:Date.now(), status:'sent'});
+      }
+      chip.remove();
+    }
+    notif('info','Offline Mode','Message saved locally. Configure Firebase for real-time sync.');
+  }
+
+  await renderMessages(); renderContactList();
+  setTimeout(()=>markLastRead(currentContact.id,'delivered'),800);
+}
+
+// Firebase push helper (safe even without Firebase loaded)
+async function pushToFirebase(path, data) {
+  // If Firebase SDK not loaded, fall through to local save
+  throw new Error('Firebase not available');
+}
+
+async function markLastRead(cid,status){
+  const raw=loadRawChats(); const msgs=raw[cid]||[];
+  const myMsgs=msgs.filter(m=>m.from==='me'&&(m.encText||m.text));
+  if(myMsgs.length){myMsgs[myMsgs.length-1].status=status;saveRawChats(raw);if(currentContact?.id===cid)renderMessagesFromCache(cid);}
+}
+
+// ══ BLOCK CONTACT ══
+function blockCurrentContact(){
+  if(!currentContact)return;
+  const bl=getBlockedList();
+  if(!bl.includes(currentContact.id)){bl.push(currentContact.id);saveBlockedList(bl);}
+  notif('warning','Blocked',currentContact.name+' has been blocked');
+  currentContact=null;
+  document.getElementById('no-chat-state').classList.remove('hidden');
+  document.getElementById('chat-active').classList.add('hidden');
+  renderContactList();
+}
+
+// ══ MISC UI HELPERS ══
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px';}
+function msgKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function toggleVoiceNote(){}
+function handleMsgFile(inp){
+  const files=Array.from(inp.files||[]);
+  files.forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    const r=new FileReader();
+    r.onload=e=>{
+      const chip=document.createElement('div');chip.className='chip';chip.dataset.img=e.target.result;
+      const name=document.createElement('span');name.className='chip-n';name.textContent=f.name;
+      const x=document.createElement('span');x.className='chip-x';x.textContent='×';x.onclick=()=>chip.remove();
+      chip.appendChild(name);chip.appendChild(x);
+      document.getElementById('msg-chips').appendChild(chip);
+    };
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+
+async function reEnrollFace(){
+  if(!confirm('Re-enroll your face? This will replace the existing Face ID.'))return;
+  feState='idle';
+  const u=getUser();if(!u)return;
+  regData={...u};
+  goPage('register');showRegStep(2);
+}
+
+// ══ API KEY ══
+function openApikModal(){
+  const modal=document.getElementById('apik-modal');modal.classList.remove('hidden');
+  const key=getApiKey();
+  document.getElementById('apik-inp').value=key?key.slice(0,18)+'…':'';
+  document.getElementById('apik-status').textContent=key?'✓ Key saved — AI is active':'';
+}
+function closeApikModal(){document.getElementById('apik-modal').classList.add('hidden');}
+function saveApiKey(){
+  const raw=document.getElementById('apik-inp').value.trim();
+  if(!raw||raw.includes('…')){notif('warning','No Key','Paste your full sk-ant-… key');return;}
+  if(!raw.startsWith('sk-ant')){notif('warning','Invalid','Key should start with sk-ant-');return;}
+  localStorage.setItem(API_KEY_STORE,raw);
+  document.getElementById('apik-status').textContent='✓ Saved! AI is active.';
+  notif('success','API Key Saved','Claude AI is now connected');
+  setTimeout(closeApikModal,1200);
+  populateProfiles();
+}
+function getApiKey(){return localStorage.getItem(API_KEY_STORE)||'';}
+
+// ══ CHANGE PASSWORD ══
+function openCpwModal(){document.getElementById('cpw-modal').classList.remove('hidden');}
+function closeCpwModal(){document.getElementById('cpw-modal').classList.add('hidden');document.getElementById('cpw-err').textContent='';}
+function changePassword(){
+  const cur=document.getElementById('cpw-current').value;
+  const nw=document.getElementById('cpw-new').value;
+  const cf=document.getElementById('cpw-confirm').value;
+  const err=document.getElementById('cpw-err');
+  const u=getUser();
+  if(!u){err.textContent='No account found';return;}
+  if(cur!==u.key){err.textContent='Current key is wrong';return;}
+  if(nw.length!==6||!/^\d+$/.test(nw)){err.textContent='New key must be 6 digits';return;}
+  if(nw!==cf){err.textContent='Keys do not match';return;}
+  u.key=nw; saveUser(u); currentUser=u;
+  notif('success','Key Updated','Your safe key has been changed');
+  closeCpwModal();
+}
+
+// ══ FIREBASE CONFIG ══
+function getFirebaseConfig() {
+  try { return JSON.parse(localStorage.getItem(FIREBASE_CONFIG_KEY)); } catch { return null; }
+}
+function saveFirebaseConfig() {
+  const config = {
+    apiKey: document.getElementById('fb-apikey').value.trim(),
+    authDomain: document.getElementById('fb-domain').value.trim(),
+    databaseURL: document.getElementById('fb-dburl').value.trim(),
+    projectId: document.getElementById('fb-project').value.trim(),
+    storageBucket: document.getElementById('fb-bucket').value.trim(),
+    messagingSenderId: document.getElementById('fb-sender').value.trim(),
+    appId: document.getElementById('fb-appid').value.trim()
+  };
+  if(!config.apiKey || !config.databaseURL) {
+    document.getElementById('fb-status').textContent = '❌ apiKey and databaseURL required';
+    return;
+  }
+  localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(config));
+  document.getElementById('fb-status').textContent = '✓ Config saved! Restart app to connect.';
+  notif('success','Firebase Config Saved','Realtime messaging enabled');
+  setTimeout(closeFirebaseModal, 1500);
+  populateProfiles();
+}
+function closeFirebaseModal() {
+  document.getElementById('firebase-modal').classList.add('hidden');
+  document.getElementById('fb-status').textContent = '';
+}
+function openFirebaseModal() {
+  const modal = document.getElementById('firebase-modal');
+  modal.classList.remove('hidden');
+  const saved = getFirebaseConfig();
+  if(saved) {
+    document.getElementById('fb-apikey').value = saved.apiKey || '';
+    document.getElementById('fb-domain').value = saved.authDomain || '';
+    document.getElementById('fb-dburl').value = saved.databaseURL || '';
+    document.getElementById('fb-project').value = saved.projectId || '';
+    document.getElementById('fb-bucket').value = saved.storageBucket || '';
+    document.getElementById('fb-sender').value = saved.messagingSenderId || '';
+    document.getElementById('fb-appid').value = saved.appId || '';
+    document.getElementById('fb-status').textContent = '✓ Configured';
+  }
+}
+function getFirebaseDb() {
+  return firebaseDb;
+}
+
+// ══ TIME HELPERS ══
+function fmtTime(ts){const d=new Date(ts),now=new Date();const diff=now-d;if(diff<86400000&&d.getDate()===now.getDate())return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});if(diff<86400000*2)return'Yesterday';return d.toLocaleDateString([],{day:'2-digit',month:'short'});}
+function fmtChatTime(ts){return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function fmtDate(ts){const d=new Date(ts),now=new Date();if(d.getDate()===now.getDate())return'Today';const y=new Date(now);y.setDate(now.getDate()-1);if(d.getDate()===y.getDate())return'Yesterday';return d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'});}
+
+// ══ ROBOT ══
+function loadRobotPrefs(){
+  const sn=localStorage.getItem(ROBOT_KEY);if(sn)robotName=sn;
+  const sv=localStorage.getItem(VOICE_KEY);if(sv)voiceType=sv;
+  const sl=localStorage.getItem(LANG_KEY);if(sl)langChoice=sl;
+  updateRobotDisplay();
+  setTimeout(()=>{
+    document.querySelectorAll('#voiceSeg .ctrl-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===voiceType));
+    document.querySelectorAll('#langSeg .ctrl-btn').forEach(b=>{const m={'English':'en','Telugu':'te','Hindi':'hi'};b.classList.toggle('active',m[b.textContent]===langChoice);});
+    const ta=document.getElementById('ai-ta');if(ta)ta.placeholder=langCfg[langChoice].ph;
+  },200);
+}
+function saveRobotName(){
+  const inp=document.getElementById('robot-name-input'),name=inp.value.trim();
+  if(!name){notif('warning','Required','Enter a name');return;}
+  robotName=name.toUpperCase();localStorage.setItem(ROBOT_KEY,robotName);updateRobotDisplay();
+  inp.value='';const msg=`My name is ${robotName}. I am your dedicated AI assistant.`;
+  setRobotSpeech(msg);speakResponse(msg);notif('success','Name Saved',`AI is now called ${robotName}`);
+}
+function updateRobotDisplay(){
+  const badge=document.getElementById('robot-name-badge');if(badge)badge.textContent=`[ ${robotName} — ONLINE ]`;
+  const title=document.getElementById('ai-panel-title');if(title)title.textContent=robotName;
+  const disp=document.getElementById('robot-name-display');if(disp)disp.textContent=`Active: ${robotName}`;
+  const inp=document.getElementById('robot-name-input');if(inp)inp.placeholder=`Current: ${robotName}`;
+}
+function setVoiceType(v,btn){
+  voiceType=v;localStorage.setItem(VOICE_KEY,v);
+  document.querySelectorAll('#voiceSeg .ctrl-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  notif('info','Voice',v==='male'?'Deep male voice':'Female voice');
+}
+function setLang(l,btn){
+  langChoice=l;localStorage.setItem(LANG_KEY,l);
+  document.querySelectorAll('#langSeg .ctrl-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  const ta=document.getElementById('ai-ta');if(ta)ta.placeholder=langCfg[l].ph;
+  const vs=document.getElementById('voice-status');if(vs)vs.textContent=langCfg[l].name.toUpperCase();
+  notif('info','Language','Now responding in '+langCfg[l].name);
+}
+
+// ══ ROBOT ANIMATION ══
+function setRobotState(state){
+  const root=document.getElementById('roboRoot'),orb=document.getElementById('speechOrb');
+  if(orb)orb.className='speech-orb'+(state==='speaking'?' speaking':state==='thinking'?' thinking':'');
+  document.getElementById('thinkDotsAi').className='think-dots-ai'+(state==='thinking'?' on':'');
+  document.getElementById('voiceWaves').className='voice-waves'+(state==='speaking'?' on':'');
+  if(root){
+    if(state==='speaking'){root.style.animation='robTalk .4s ease-in-out infinite,robFloat 4s ease-in-out infinite';root.style.filter='drop-shadow(0 20px 50px rgba(0,212,255,.5))';startMouthAnim();setEyeGlow('bright');setChestPulse(true);}
+    else if(state==='thinking'){root.style.animation='robThink 1.4s ease-in-out infinite,robFloat 4s ease-in-out infinite';root.style.filter='drop-shadow(0 20px 50px rgba(201,174,126,.4))';stopMouthAnim();setEyeGlow('dim');setChestPulse(false);}
+    else{root.style.animation='robFloat 4s ease-in-out infinite';root.style.filter='drop-shadow(0 20px 50px rgba(74,158,255,.35))';stopMouthAnim();setEyeGlow('normal');setChestPulse(false);}
+  }
+}
+function setEyeGlow(mode){
+  const lg=document.getElementById('eyeLeftGlow'),rg=document.getElementById('eyeRightGlow');
+  const lc=document.getElementById('eyeLeftCore'),rc=document.getElementById('eyeRightCore');
+  if(!lg)return;
+  if(mode==='bright'){lg.setAttribute('fill','url(#eyeGlow)');rg.setAttribute('fill','url(#eyeGlow)');lc.setAttribute('opacity','1');rc.setAttribute('opacity','1');}
+  else if(mode==='dim'){lg.setAttribute('fill','url(#eyeGlowDim)');rg.setAttribute('fill','url(#eyeGlowDim)');lc.setAttribute('opacity','.4');rc.setAttribute('opacity','.4');}
+  else{lg.setAttribute('fill','url(#eyeGlow)');rg.setAttribute('fill','url(#eyeGlow)');lc.setAttribute('opacity','.9');rc.setAttribute('opacity','.9');}
+}
+function setChestPulse(active){
+  const b1=document.getElementById('chestBar1'),b2=document.getElementById('chestBar2'),b3=document.getElementById('chestBar3'),h=document.getElementById('heartLight');
+  if(!b1)return;
+  if(chestInterval){clearInterval(chestInterval);chestInterval=null;}
+  if(active){chestInterval=setInterval(()=>{const op=.3+Math.random()*.6;b1.setAttribute('opacity',op.toFixed(2));b2.setAttribute('opacity',(op*.8).toFixed(2));b3.setAttribute('opacity',(op*.6).toFixed(2));if(h)h.setAttribute('opacity',(op*1.2).toFixed(2));},200);}
+  else{b1.setAttribute('opacity','.4');b2.setAttribute('opacity','.4');b3.setAttribute('opacity','.4');if(h)h.setAttribute('opacity','.6');}
+}
+function startBlinking(){
+  if(blinkInterval)return;
+  blinkInterval=setInterval(()=>{
+    const l=document.getElementById('eyelidL');
+    if(l){l.setAttribute('opacity','1');setTimeout(()=>l.setAttribute('opacity','0'),150);}
+  },3500+Math.random()*2000);
+}
+function setRobotSpeech(text){const orb=document.getElementById('speechOrb');if(orb)orb.textContent=text;}
+const getMBars=()=>[1,2,3,4,5,6].map(i=>document.getElementById('mb'+i)).filter(Boolean);
+function startMouthAnim(){
+  if(mouthTick)return;
+  mouthTick=setInterval(()=>{getMBars().forEach(b=>{const h=1+Math.random()*6;b.setAttribute('height',h.toFixed(1));b.setAttribute('y',(84+3-h/2).toFixed(1));b.setAttribute('opacity',(.15+Math.random()*.85).toFixed(2));});},65);
+}
+function stopMouthAnim(){
+  if(mouthTick){clearInterval(mouthTick);mouthTick=null;}
+  getMBars().forEach(b=>{b.setAttribute('height','4');b.setAttribute('y','84');b.setAttribute('opacity','.45');});
+}
+
+// ══ TTS ══
+function getBestVoice(){
+  const voices=window.speechSynthesis.getVoices();if(!voices.length)return null;
+  const lc=langCfg[langChoice].code,base=lc.split('-')[0];
+  let exact=voices.filter(v=>v.lang===lc);
+  let baseP=voices.filter(v=>v.lang.startsWith(base));
+  let en=voices.filter(v=>v.lang.startsWith('en'));
+  let pool=exact.length?exact:baseP.length?baseP:en.length?en:voices;
+  const mk=['david','james','daniel','mark','alex','aaron','oliver'];
+  const fk=['samantha','victoria','karen','zira','sara','alice','fiona','ava'];
+  const kws=voiceType==='male'?mk:fk;
+  let best=pool.find(v=>kws.some(k=>v.name.toLowerCase().includes(k)));
+  if(!best){const gp=pool.filter(v=>v.name.toLowerCase().includes('google'));if(gp.length)best=gp[0];}
+  return best||pool[0]||voices[0]||null;
+}
+function speakResponse(text){
+  if(!window.speechSynthesis){notif('warning','Voice Unavailable','TTS not supported');return;}
+  if(currentUtterance)window.speechSynthesis.cancel();
+  const doSpeak=()=>{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=langCfg[langChoice].code;
+    const v=getBestVoice();if(v)u.voice=v;
+    if(langChoice==='te'){u.rate=0.92;u.pitch=voiceType==='male'?.85:1.05;}
+    else if(langChoice==='hi'){u.rate=0.95;u.pitch=voiceType==='male'?.82:1.08;}
+    else{u.rate=1.0;u.pitch=voiceType==='male'?.85:1.05;}
+    u.volume=1;
+    u.onstart=()=>{setRobotState('speaking');const vs=document.getElementById('voice-status');if(vs)vs.textContent='SPEAKING…';};
+    u.onend=()=>{setRobotState('idle');currentUtterance=null;const vs=document.getElementById('voice-status');if(vs)vs.textContent='';};
+    u.onerror=()=>{setRobotState('idle');currentUtterance=null;};
+    currentUtterance=u;window.speechSynthesis.speak(u);
+  };
+  const vcs=window.speechSynthesis.getVoices();
+  if(vcs.length>0){setTimeout(doSpeak,100);}
+  else{let att=0;const try_=()=>{att++;if(window.speechSynthesis.getVoices().length>0)doSpeak();else if(att<10)setTimeout(try_,200);else doSpeak();};window.speechSynthesis.onvoiceschanged=doSpeak;setTimeout(try_,300);}
+}
+
+// ══ AI ══
+async function callClaude(prompt){
+  const key=getApiKey();
+  if(!key){openApikModal();throw new Error('No API key');}
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1024,messages:[{role:'user',content:prompt}]})
+  });
+  if(!res.ok){const err=await res.json().catch(()=>({error:{message:res.statusText}}));if(res.status===401)notif('danger','Invalid Key','Check your API key');throw new Error(err?.error?.message||res.statusText);}
+  const data=await res.json();return data.content?.[0]?.text||'';
+}
+function buildSystemPrompt(){
+  const p={
+    en:`You are ${robotName}, a sophisticated chrome humanoid AI in the You N Me AI powered by Claude Sonnet. Respond in 2-3 concise English sentences. Be helpful, intelligent, direct. No markdown. Speak naturally.`,
+    te:`మీరు ${robotName}, You N Me AI లో Claude Sonnet AI. 2-3 తెలుగు వాక్యాలలో సమాధానం ఇవ్వండి.`,
+    hi:`आप ${robotName} हैं, You N Me AI में Claude Sonnet AI। 2-3 हिंदी वाक्यों में उत्तर दें।`
+  };
+  return p[langChoice]||p.en;
+}
+async function sendAI(){
+  if(isAiProcessing)return;
+  const ta=document.getElementById('ai-ta');
+  const text=ta.value.trim();if(!text)return;
+  ta.value='';ta.style.height='auto';
+  if(currentUtterance)window.speechSynthesis.cancel();
+  isAiProcessing=true;setRobotState('thinking');setRobotSpeech('Processing your request…');
+  const vs=document.getElementById('voice-status');if(vs)vs.textContent='THINKING…';
+  try{
+    const sys=buildSystemPrompt();
+    let hist='';
+    for(let i=0;i<conversationHistory.length;i+=2){const u=conversationHistory[i],a=conversationHistory[i+1];if(u&&a)hist+=`\nUser: ${u.content}\n${robotName}: ${a.content}`;}
+    const full=`${sys}${hist}\n\nUser: ${text}\n${robotName}:`;
+    let reply=await callClaude(full);
+    reply=reply.replace(/\*\*/g,'').replace(/\*/g,'').replace(/`/g,'').replace(/#{1,6}\s/g,'').replace(/\n+/g,' ').trim();
+    reply=reply.replace(new RegExp(`^${robotName}:\\s*`,'i'),'').trim();
+    if(!reply||reply.length<3)reply=getFallbackReply();
+    conversationHistory.push({role:'user',content:text},{role:'assistant',content:reply});
+    if(conversationHistory.length>20)conversationHistory=conversationHistory.slice(-20);
+    setRobotState('idle');setRobotSpeech(reply);setTimeout(()=>speakResponse(reply),150);
+  }catch(e){
+    const errMsg=e.message.includes('API key')?e.message:getFallbackReply();
+    setRobotState('idle');setRobotSpeech(errMsg);setTimeout(()=>speakResponse(errMsg),150);
+    notif('warning','AI','Could not get response');
+  }finally{isAiProcessing=false;const vs=document.getElementById('voice-status');if(vs)vs.textContent='';}
+}
+function getFallbackReply(){
+  const r={en:`I am ${robotName}, fully operational.`,te:`నేను ${robotName}, మీకు సహాయం చేయడానికి సిద్ధంగా ఉన్నాను.`,hi:`मैं ${robotName} हूं, आपकी सेवा में तैयार।`};
+  return r[langChoice]||r.en;
+}
+function clearRobotChat(){
+  if(currentUtterance)window.speechSynthesis.cancel();
+  stopMouthAnim();conversationHistory=[];setRobotState('idle');
+  const g={en:`Systems reset. I am ${robotName}. How can I assist?`,te:`రీసెట్. నేను ${robotName}.`,hi:`रीसेट। मैं ${robotName}।`};
+  const msg=g[langChoice]||g.en;setRobotSpeech(msg);setTimeout(()=>speakResponse(msg),300);
+  notif('info','Reset','AI reinitialized');
+}
+function aiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}}
+function toggleAiMic(){
+  const btn=document.getElementById('ai-mic-btn');
+  if(!('webkitSpeechRecognition'in window||'SpeechRecognition'in window)){notif('warning','Voice','Use Chrome/Edge for voice');return;}
+  if(isListening){recognition?.stop();isListening=false;btn.textContent='🎤';btn.classList.remove('on');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();recognition.lang=langCfg[langChoice].code;recognition.continuous=false;recognition.interimResults=false;
+  recognition.onresult=e=>{document.getElementById('ai-ta').value=e.results[0][0].transcript;isListening=false;btn.textContent='🎤';btn.classList.remove('on');sendAI();};
+  recognition.onend=()=>{isListening=false;btn.textContent='🎤';btn.classList.remove('on');};
+  recognition.start();isListening=true;btn.textContent='🔴';btn.classList.add('on');
+  const vs=document.getElementById('voice-status');if(vs)vs.textContent='LISTENING…';
+}
+
+// ══ IMAGE GEN ══
+function openImgen(){document.getElementById('imgen-modal').classList.remove('hidden');document.getElementById('ig-preview').innerHTML='<div class="ig-empty">Awaiting creative direction…</div>';document.getElementById('ig-prompt').value='';currentGeneratedImage=null;}
+function closeImgen(){document.getElementById('imgen-modal').classList.add('hidden');}
+function generateImage(){
+  const p=document.getElementById('ig-prompt').value.trim();if(!p)return;
+  const el=document.getElementById('ig-preview');
+  el.innerHTML='<div class="ig-empty" style="opacity:.4;font-family:var(--mono);font-size:11px;">Rendering…</div>';
+  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=1024&height=1024&nologo=true&seed=${Date.now()}&model=flux`;
+  currentGeneratedImage=url;
+  const img=new Image();
+  img.onload=()=>{el.innerHTML='';el.appendChild(img);img.style.cssText='width:100%;height:100%;object-fit:cover;';};
+  img.onerror=()=>{el.innerHTML='<div class="ig-empty">Generation failed. Try again.</div>';};
+  img.src=url;
+}
+
+// ══ SECURITY SNAPSHOTS ══
+function clearAllSnapshots() {
+  const alerts = getSecurityAlerts();
+  if(!alerts.length){ notif('info','No Snapshots','There are no intruder snapshots to clear'); return; }
+  if(!confirm(`Delete all ${alerts.length} intruder snapshot(s)? This cannot be undone.`)) return;
+  localStorage.removeItem(ALERTS_KEY);
+  updateAlertsCount();
+  updateSnapshotCount();
+  notif('success','Cleared','All security snapshots deleted');
+}
+function updateSnapshotCount() {
+  const alerts = getSecurityAlerts();
+  const el = document.getElementById('sett-snapshot-count');
+  if(!el) return;
+  if(alerts.length === 0) {
+    el.textContent = 'No unauthorized access attempts';
+    el.style.color = 'var(--text-m)';
+  } else if(alerts.length === 1) {
+    el.textContent = '1 unauthorized access captured';
+    el.style.color = 'var(--red)';
+  } else {
+    el.textContent = `${alerts.length} unauthorized accesses captured`;
+    el.style.color = 'var(--red)';
+  }
+}
+</script>
+</body>
+</html>
